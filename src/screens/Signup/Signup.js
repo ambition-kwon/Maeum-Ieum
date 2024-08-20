@@ -1,12 +1,15 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 
 export default function Singup() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const navigation = useNavigation();
 
   const handleNextPress = () => {
     console.log('Next icon pressed');
+    navigation.navigate('SignupName');
   };
 
   return (
@@ -25,7 +28,7 @@ export default function Singup() {
       </View>
       <View style={styles.inputContainer}>
         <View style={styles.inputWrapper}>
-          <Image source={require('./src/assets/icons/person.png')} style={styles.icon} />
+          <Image source={require('../../assets/icons/person.png')} style={styles.icon} />
           <TextInput
             style={styles.input}
             placeholder="아이디를 입력해주세요"
@@ -38,7 +41,7 @@ export default function Singup() {
           </TouchableOpacity>
         </View>
         <View style={styles.inputWrapper}>
-          <Image source={require('./src/assets/icons/lock.png')} style={styles.icon} />
+          <Image source={require('../../assets/icons/lock.png')} style={styles.icon} />
           <TextInput
             style={styles.input}
             placeholder="비밀번호를 입력해주세요"
@@ -49,7 +52,7 @@ export default function Singup() {
           />
         </View>
         <View style={styles.inputWrapper}>
-          <Image source={require('./src/assets/icons/lock.png')} style={styles.icon} />
+          <Image source={require('../../assets/icons/lock.png')} style={styles.icon} />
           <TextInput
             style={styles.input}
             placeholder="비밀번호를 재 입력해주세요"
@@ -59,7 +62,7 @@ export default function Singup() {
         </View>
       </View>
       <TouchableOpacity style={styles.nextIconContainer} onPress={handleNextPress} activeOpacity={0.7}>
-        <Image source={require('./src/assets/icons/next.png')} style={styles.nextIcon} />
+        <Image source={require('../../assets/icons/next.png')} style={styles.nextIcon} />
       </TouchableOpacity>
     </View>
   );

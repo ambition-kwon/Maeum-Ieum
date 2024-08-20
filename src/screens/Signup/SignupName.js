@@ -1,9 +1,13 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, StyleSheet, Image, TouchableOpacity } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 
 export default function SignupName() {
+  const navigation = useNavigation();
+
   const handleNextPress = () => {
     console.log('Next icon pressed');
+    navigation.navigate('SignupGender');
   };
 
   return (
@@ -30,7 +34,7 @@ export default function SignupName() {
         </View>
       </View>
       <TouchableOpacity style={styles.nextIconContainer} onPress={handleNextPress} activeOpacity={0.7}>
-        <Image source={require('./src/assets/icons/next.png')} style={styles.nextIcon} />
+        <Image source={require('../../assets/icons/next.png')} style={styles.nextIcon} />
       </TouchableOpacity>
     </View>
   );

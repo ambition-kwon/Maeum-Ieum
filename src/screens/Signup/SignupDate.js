@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
 import DatePicker from 'react-native-date-picker';
+import { useNavigation } from '@react-navigation/native';
 
 export default function SignupDate() {
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [formattedDate, setFormattedDate] = useState('');
+  const navigation = useNavigation();
 
   const handleConfirm = (date) => {
     setDatePickerVisibility(false);
@@ -16,6 +18,7 @@ export default function SignupDate() {
 
   const handleNextPress = () => {
     console.log('Next icon pressed');
+    navigation.navigate('SignupOrg');
   };
 
   return (
@@ -55,7 +58,7 @@ export default function SignupDate() {
       )}
 
       <TouchableOpacity style={styles.nextIconContainer} onPress={handleNextPress} activeOpacity={0.7}>
-        <Image source={require('./src/assets/icons/next.png')} style={styles.nextIcon} />
+        <Image source={require('../../assets/icons/next.png')} style={styles.nextIcon} />
       </TouchableOpacity>
     </View>
   );

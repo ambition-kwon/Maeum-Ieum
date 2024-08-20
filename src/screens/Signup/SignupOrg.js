@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, Image, TouchableOpacity, TextInput, StyleSheet, FlatList, TouchableWithoutFeedback } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 
 const dummyData = [
   '행복 복지관',
@@ -14,9 +15,11 @@ export default function SignupOrg() {
   const [searchText, setSearchText] = useState('');
   const [filteredData, setFilteredData] = useState([]);
   const [showList, setShowList] = useState(false);
+  const navigation = useNavigation();
 
   const handleNextPress = () => {
     console.log('Next icon pressed');
+    navigation.navigate('SignupImg');
   };
 
   const handleSearch = (text) => {
@@ -62,7 +65,7 @@ export default function SignupOrg() {
               onFocus={() => setShowList(true)}
             />
             <TouchableOpacity style={styles.searchButton} onPress={() => handleSearch(searchText)}>
-              <Image source={require('./src/assets/icons/search.png')} style={styles.searchIcon} />
+              <Image source={require('../../assets/icons/search.png')} style={styles.searchIcon} />
             </TouchableOpacity>
           </View>
         </View>
@@ -81,7 +84,7 @@ export default function SignupOrg() {
         )}
 
         <TouchableOpacity style={styles.nextIconContainer} onPress={handleNextPress} activeOpacity={0.7}>
-          <Image source={require('./src/assets/icons/next.png')} style={styles.nextIcon} />
+          <Image source={require('../../assets/icons/next.png')} style={styles.nextIcon} />
         </TouchableOpacity>
       </View>
     </TouchableWithoutFeedback>

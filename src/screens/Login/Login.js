@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 
 export default function Login() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const navigation = useNavigation();
 
   return (
     <View style={styles.container}>
@@ -13,7 +15,7 @@ export default function Login() {
       </View>
       <View style={styles.inputContainer}>
         <View style={styles.inputWrapper}>
-          <Image source={require('./src/assets/icons/person.png')} style={styles.icon} />
+          <Image source={require('../../assets/icons/person.png')} style={styles.icon} />
           <TextInput
             style={styles.input}
             placeholder="아이디를 입력해주세요"
@@ -23,7 +25,7 @@ export default function Login() {
           />
         </View>
         <View style={styles.inputWrapper}>
-          <Image source={require('./src/assets/icons/lock.png')} style={styles.icon} />
+          <Image source={require('../../assets/icons/lock.png')} style={styles.icon} />
           <TextInput
             style={styles.input}
             placeholder="비밀번호를 입력해주세요"
@@ -35,7 +37,7 @@ export default function Login() {
         </View>
       </View>
       <View style={styles.forgotContainer}>
-        <TouchableOpacity>
+        <TouchableOpacity onPress={() => navigation.navigate('CodeLogin')}>
           <Text style={styles.forgotText}>혹시, 요양사가 아니신가요?</Text>
         </TouchableOpacity>
         <TouchableOpacity>
@@ -45,7 +47,7 @@ export default function Login() {
       <TouchableOpacity style={styles.loginButton}>
         <Text style={styles.loginButtonText}>로그인</Text>
       </TouchableOpacity>
-      <TouchableOpacity>
+      <TouchableOpacity onPress={() => navigation.navigate('Signup')}>
         <Text style={styles.signupText}>회원가입</Text>
       </TouchableOpacity>
     </View>

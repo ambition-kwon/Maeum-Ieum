@@ -1,7 +1,9 @@
 import React from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 
 export default function CodeLogin() {
+  const navigation = useNavigation();
 
   return (
     <View style={styles.container}>
@@ -28,7 +30,7 @@ export default function CodeLogin() {
       <TouchableOpacity style={styles.continueButton}>
         <Text style={styles.continueButtonText}>계속하기</Text>
       </TouchableOpacity>
-      <TouchableOpacity>
+      <TouchableOpacity onPress={() => navigation.navigate('Login')}>
         <Text style={styles.changeText}>혹시, 요양사이신가요?</Text>
       </TouchableOpacity>
     </View>

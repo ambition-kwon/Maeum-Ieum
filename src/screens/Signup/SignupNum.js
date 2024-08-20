@@ -1,11 +1,14 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, StyleSheet, Image, TouchableOpacity } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 
 export default function SignupNum() {
   const [searchText, setSearchText] = useState('');
+  const navigation = useNavigation();
 
   const handleNextPress = () => {
     console.log('Next icon pressed');
+    navigation.navigate('AdminApprove');
   };
 
   return (
@@ -33,7 +36,7 @@ export default function SignupNum() {
         </View>
       </View>
       <TouchableOpacity style={styles.nextIconContainer} onPress={handleNextPress} activeOpacity={0.7}>
-        <Image source={require('./src/assets/icons/next.png')} style={styles.nextIcon} />
+        <Image source={require('../../assets/icons/next.png')} style={styles.nextIcon} />
       </TouchableOpacity>
     </View>
   );

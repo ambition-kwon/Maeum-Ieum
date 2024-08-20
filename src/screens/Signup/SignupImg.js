@@ -1,13 +1,16 @@
 import React, { useState } from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import { launchImageLibrary } from 'react-native-image-picker';
+import { useNavigation } from '@react-navigation/native';
 
 export default function SignupImg() {
   const [searchText, setSearchText] = useState('');
   const [imageUri, setImageUri] = useState(null);
+  const navigation = useNavigation();
 
   const handleNextPress = () => {
     console.log('Next icon pressed');
+    navigation.navigate('SignupNum');
   };
 
   const handleImagePress = () => {
@@ -57,7 +60,7 @@ export default function SignupImg() {
       </TouchableOpacity>
 
       <TouchableOpacity style={styles.nextIconContainer} onPress={handleNextPress} activeOpacity={0.7}>
-        <Image source={require('./src/assets/icons/next.png')} style={styles.nextIcon} />
+        <Image source={require('../../assets/icons/next.png')} style={styles.nextIcon} />
       </TouchableOpacity>
     </View>
   );

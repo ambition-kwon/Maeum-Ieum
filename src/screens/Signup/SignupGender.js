@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 
 export default function SignupGender() {
   const [selectedGender, setSelectedGender] = useState(null);
+  const navigation = useNavigation();
 
   const handleGenderPress = (gender) => {
     setSelectedGender(gender);
@@ -10,6 +12,7 @@ export default function SignupGender() {
 
   const handleNextPress = () => {
     console.log('Next icon pressed');
+    navigation.navigate('SignupDate');
   };
 
   return (
@@ -34,7 +37,7 @@ export default function SignupGender() {
           ]}
           onPress={() => handleGenderPress('male')}
         >
-          <Image source={require('./src/assets/icons/male.png')} style={styles.genderIcon} />
+          <Image source={require('../../assets/icons/male.png')} style={styles.genderIcon} />
         </TouchableOpacity>
         <TouchableOpacity
           style={[
@@ -43,11 +46,11 @@ export default function SignupGender() {
           ]}
           onPress={() => handleGenderPress('female')}
         >
-          <Image source={require('./src/assets/icons/female.png')} style={styles.genderIcon} />
+          <Image source={require('../../assets/icons/female.png')} style={styles.genderIcon} />
         </TouchableOpacity>
       </View>
       <TouchableOpacity style={styles.nextIconContainer} onPress={handleNextPress} activeOpacity={0.7}>
-        <Image source={require('./src/assets/icons/next.png')} style={styles.nextIcon} />
+        <Image source={require('../../assets/icons/next.png')} style={styles.nextIcon} />
       </TouchableOpacity>
     </View>
   );
