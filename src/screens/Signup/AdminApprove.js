@@ -1,11 +1,13 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { View, Text, StyleSheet, Image, Animated, BackHandler } from 'react-native';
+import { View, Text, StyleSheet, Animated, BackHandler } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import Octicons from 'react-native-vector-icons/Octicons';
 
 export default function AdminApprove() {
   const navigation = useNavigation();
   const scaleAnim = useRef(new Animated.Value(1)).current; // 초기 스케일 값
   const fadeAnim = useRef(new Animated.Value(0)).current; // 초기 투명도 값
+  const [countdown, setCountdown] = useState(3); // 카운트다운 초기값
 
   useEffect(() => {
     // 페이드 인 애니메이션
@@ -27,6 +29,18 @@ export default function AdminApprove() {
       ])
     ).start();
 
+    // 카운트다운 타이머 설정
+    const timer = setInterval(() => {
+      setCountdown(prevCountdown => {
+        if (prevCountdown === 1) {
+          clearInterval(timer);
+          navigation.navigate('Login');
+        }
+        return prevCountdown - 1;
+      });
+    }, 1000);
+
+    // 뒤로가기 버튼 누를 시 로그인 페이지로 이동
     const backAction = () => {
       navigation.navigate('Login');
       return true;
@@ -34,7 +48,10 @@ export default function AdminApprove() {
 
     const backHandler = BackHandler.addEventListener('hardwareBackPress', backAction);
 
-    return () => backHandler.remove();
+    return () => {
+      backHandler.remove();
+      clearInterval(timer); // 타이머 클리어
+    };
   }, [scaleAnim, fadeAnim, navigation]);
 
   const animatedStyle = {
@@ -44,11 +61,12 @@ export default function AdminApprove() {
 
   return (
     <View style={styles.container}>
-      <Animated.View style={[styles.imageContainer, animatedStyle]}>
-        <Image source={require('../../assets/icons/check.png')} style={styles.image} />
+      <Animated.View style={[styles.iconContainer, animatedStyle]}>
+        <Octicons name="check-circle-fill" size={100} color="#FCCB02" />
       </Animated.View>
       <Text style={styles.mainText}>관리자 승인 후 이용 가능</Text>
       <Text style={styles.subText}>관리자 승인 후 알림으로 알려드리겠습니다.</Text>
+      <Text style={styles.subText}>{countdown}초 후에 자동으로 페이지가 닫힙니다</Text>
     </View>
   );
 }
@@ -60,12 +78,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: '#ffffff',
   },
-  imageContainer: {
+  iconContainer: {
     marginBottom: 40,
-  },
-  image: {
-    width: 100,
-    height: 100,
   },
   mainText: {
     fontSize: 26,
