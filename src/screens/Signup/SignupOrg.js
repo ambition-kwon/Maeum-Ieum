@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { View, Text, Image, TouchableOpacity, TextInput, StyleSheet, FlatList, TouchableWithoutFeedback } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import IoniconsIcons from 'react-native-vector-icons/Ionicons';
+import SimpleLineIcons from 'react-native-vector-icons/SimpleLineIcons';
 
 const dummyData = [
   '행복 복지관',
@@ -65,7 +67,7 @@ export default function SignupOrg() {
               onFocus={() => setShowList(true)}
             />
             <TouchableOpacity style={styles.searchButton} onPress={() => handleSearch(searchText)}>
-              <Image source={require('../../assets/icons/search.png')} style={styles.searchIcon} />
+              <SimpleLineIcons name="magnifier" size={20} color="#58A6FF" />
             </TouchableOpacity>
           </View>
         </View>
@@ -84,7 +86,7 @@ export default function SignupOrg() {
         )}
 
         <TouchableOpacity style={styles.nextIconContainer} onPress={handleNextPress} activeOpacity={0.7}>
-          <Image source={require('../../assets/icons/next.png')} style={styles.nextIcon} />
+          <IoniconsIcons name="arrow-forward-circle" size={50} color="#FCCB02" />
         </TouchableOpacity>
       </View>
     </TouchableWithoutFeedback>
@@ -124,7 +126,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   welcomeText: {
-    fontSize: 20,
+    fontSize: 24,
     fontWeight: '900',
     textAlign: 'left',
     color: '#000',
@@ -144,10 +146,11 @@ const styles = StyleSheet.create({
   searchInput: {
     flex: 1,
     paddingLeft: 10,
-    fontSize: 16,
+    fontSize: 20,
   },
   searchButton: {
     marginLeft: 10,
+    marginRight: 10,
   },
   searchIcon: {
     width: 30,
@@ -177,10 +180,5 @@ const styles = StyleSheet.create({
     height: 50,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  nextIcon: {
-    width: 50,
-    height: 50,
-    resizeMode: 'contain',
   },
 });

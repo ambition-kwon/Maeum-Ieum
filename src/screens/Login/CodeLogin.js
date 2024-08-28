@@ -48,9 +48,8 @@ const styles = StyleSheet.create({
     marginBottom: 60,
   },
   welcomeText: {
-    fontSize: 20,
+    fontSize: 28,
     fontWeight: '900',
-    marginBottom: 5,
     textAlign: 'left',
     color: '#000',
   },
@@ -58,7 +57,7 @@ const styles = StyleSheet.create({
     color: '#FCCB02',
   },
   subText: {
-    fontSize: 14,
+    fontSize: 17,
     marginBottom: 5,
     fontWeight: 'bold',
     color: '#4B4B4B',
@@ -86,10 +85,11 @@ const styles = StyleSheet.create({
   },
   continueButtonText: {
     color: '#000',
-    fontSize: 20,
+    fontSize: 24,
     fontWeight: 'bold',
   },
   changeText: {
     textAlign: 'center',
+    fontSize: 16,
   },
 });

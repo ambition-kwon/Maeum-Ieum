@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
 import DatePicker from 'react-native-date-picker';
 import { useNavigation } from '@react-navigation/native';
+import IoniconsIcons from 'react-native-vector-icons/Ionicons';
 
 export default function SignupDate() {
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
@@ -58,7 +59,7 @@ export default function SignupDate() {
       )}
 
       <TouchableOpacity style={styles.nextIconContainer} onPress={handleNextPress} activeOpacity={0.7}>
-        <Image source={require('../../assets/icons/next.png')} style={styles.nextIcon} />
+        <IoniconsIcons name="arrow-forward-circle" size={50} color="#FCCB02" />
       </TouchableOpacity>
     </View>
   );
@@ -97,7 +98,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   welcomeText: {
-    fontSize: 20,
+    fontSize: 24,
     fontWeight: '900',
     textAlign: 'left',
     color: '#000',
@@ -119,10 +120,5 @@ const styles = StyleSheet.create({
     height: 50,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  nextIcon: {
-    width: 50,
-    height: 50,
-    resizeMode: 'contain',
   },
 });

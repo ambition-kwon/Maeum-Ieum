@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 export default function Login() {
   const [username, setUsername] = useState('');
@@ -15,7 +17,7 @@ export default function Login() {
       </View>
       <View style={styles.inputContainer}>
         <View style={styles.inputWrapper}>
-          <Image source={require('../../assets/icons/person.png')} style={styles.icon} />
+          <MaterialIcons name="person-outline" size={28} color="#959595" />
           <TextInput
             style={styles.input}
             placeholder="아이디를 입력해주세요"
@@ -25,7 +27,7 @@ export default function Login() {
           />
         </View>
         <View style={styles.inputWrapper}>
-          <Image source={require('../../assets/icons/lock.png')} style={styles.icon} />
+          <MaterialCommunityIcons name="lock-outline" size={28} color="#959595" />
           <TextInput
             style={styles.input}
             placeholder="비밀번호를 입력해주세요"
@@ -65,7 +67,7 @@ const styles = StyleSheet.create({
     marginBottom: 40,
   },
   welcomeText: {
-    fontSize: 20,
+    fontSize: 28,
     fontWeight: '900',
     marginBottom: 5,
     textAlign: 'left',
@@ -81,15 +83,10 @@ const styles = StyleSheet.create({
     borderBottomColor: '#DDD',
     marginBottom: 10,
   },
-  icon: {
-    width: 24,
-    height: 24,
-    resizeMode: 'contain',
-  },
   input: {
     flex: 1,
     paddingLeft: 10,
-    fontSize: 16,
+    fontSize: 20,
   },
   forgotContainer: {
     flexDirection: 'row',
@@ -112,13 +109,13 @@ const styles = StyleSheet.create({
   },
   loginButtonText: {
     color: '#000',
-    fontSize: 20,
+    fontSize: 24,
     fontWeight: 'bold',
   },
   signupText: {
     textAlign: 'center',
     color: '#959595',
-    fontSize: 20,
+    fontSize: 24,
     fontWeight: 'bold',
   },
 });

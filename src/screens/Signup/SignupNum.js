@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import IoniconsIcons from 'react-native-vector-icons/Ionicons';
 
 export default function SignupNum() {
   const [searchText, setSearchText] = useState('');
@@ -36,7 +37,7 @@ export default function SignupNum() {
         </View>
       </View>
       <TouchableOpacity style={styles.nextIconContainer} onPress={handleNextPress} activeOpacity={0.7}>
-        <Image source={require('../../assets/icons/next.png')} style={styles.nextIcon} />
+        <IoniconsIcons name="arrow-forward-circle" size={50} color="#FCCB02" />
       </TouchableOpacity>
     </View>
   );
@@ -75,7 +76,7 @@ const styles = StyleSheet.create({
     marginBottom: 30,
   },
   welcomeText: {
-    fontSize: 20,
+    fontSize: 24,
     fontWeight: '900',
     color: '#000',
   },
@@ -103,10 +104,5 @@ const styles = StyleSheet.create({
     height: 50,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  nextIcon: {
-    width: 50,
-    height: 50,
-    resizeMode: 'contain',
   },
 });

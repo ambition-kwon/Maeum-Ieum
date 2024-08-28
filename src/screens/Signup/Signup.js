@@ -1,8 +1,11 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import IoniconsIcons from 'react-native-vector-icons/Ionicons';
 
-export default function Singup() {
+export default function Signup() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const navigation = useNavigation();
@@ -28,7 +31,7 @@ export default function Singup() {
       </View>
       <View style={styles.inputContainer}>
         <View style={styles.inputWrapper}>
-          <Image source={require('../../assets/icons/person.png')} style={styles.icon} />
+          <MaterialIcons name="person-outline" size={28} color="#959595" />
           <TextInput
             style={styles.input}
             placeholder="아이디를 입력해주세요"
@@ -41,7 +44,7 @@ export default function Singup() {
           </TouchableOpacity>
         </View>
         <View style={styles.inputWrapper}>
-          <Image source={require('../../assets/icons/lock.png')} style={styles.icon} />
+          <MaterialCommunityIcons name="lock-outline" size={28} color="#959595" />
           <TextInput
             style={styles.input}
             placeholder="비밀번호를 입력해주세요"
@@ -52,7 +55,7 @@ export default function Singup() {
           />
         </View>
         <View style={styles.inputWrapper}>
-          <Image source={require('../../assets/icons/lock.png')} style={styles.icon} />
+          <MaterialCommunityIcons name="lock-outline" size={28} color="#959595" />
           <TextInput
             style={styles.input}
             placeholder="비밀번호를 재 입력해주세요"
@@ -62,7 +65,7 @@ export default function Singup() {
         </View>
       </View>
       <TouchableOpacity style={styles.nextIconContainer} onPress={handleNextPress} activeOpacity={0.7}>
-        <Image source={require('../../assets/icons/next.png')} style={styles.nextIcon} />
+        <IoniconsIcons name="arrow-forward-circle" size={50} color="#FCCB02" />
       </TouchableOpacity>
     </View>
   );
@@ -83,7 +86,7 @@ const styles = StyleSheet.create({
     left: 5,
     right: 5,
   },
-  progress:{
+  progress: {
     flex: 1,
     height: 10,
     borderRadius: 5,
@@ -94,7 +97,7 @@ const styles = StyleSheet.create({
     marginBottom: 60,
   },
   welcomeText: {
-    fontSize: 20,
+    fontSize: 24,
     fontWeight: '900',
     marginBottom: 5,
     textAlign: 'left',
@@ -110,15 +113,10 @@ const styles = StyleSheet.create({
     borderBottomColor: '#DDD',
     marginBottom: 10,
   },
-  icon: {
-    width: 24,
-    height: 24,
-    resizeMode: 'contain',
-  },
   input: {
     flex: 1,
     paddingLeft: 10,
-    fontSize: 16,
+    fontSize: 20,
   },
   duplication: {
     backgroundColor: '#FCCB02',
@@ -141,10 +139,5 @@ const styles = StyleSheet.create({
     height: 50,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  nextIcon: {
-    width: 50,
-    height: 50,
-    resizeMode: 'contain',
   },
 });
