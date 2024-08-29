@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, StyleSheet, Image, TouchableOpacity, Modal, TouchableWithoutFeedback } from 'react-native';
 import Postcode from '@actbase/react-daum-postcode';
+import IoniconsIcons from 'react-native-vector-icons/Ionicons';
+import SimpleLineIcons from 'react-native-vector-icons/SimpleLineIcons';
 
 export default function RegisterHome() {
   const [address, setAddress] = useState('');
@@ -40,7 +42,7 @@ export default function RegisterHome() {
             editable={false}
           />
           <TouchableOpacity style={styles.searchButton} onPress={() => setShowPostcode(true)}>
-            <Image source={require('./src/assets/icons/search.png')} style={styles.searchIcon} />
+            <SimpleLineIcons name="magnifier" size={20} color="#58A6FF" />
           </TouchableOpacity>
         </View>
       </View>
@@ -54,7 +56,7 @@ export default function RegisterHome() {
         </View>
       </View>
       <TouchableOpacity style={styles.nextIconContainer} onPress={handleNextPress} activeOpacity={0.7}>
-        <Image source={require('./src/assets/icons/next.png')} style={styles.nextIcon} />
+        <IoniconsIcons name="arrow-forward-circle" size={50} color="#FCCB02" />
       </TouchableOpacity>
 
       {/* 주소 검색 모달 */}
@@ -115,7 +117,7 @@ const styles = StyleSheet.create({
     marginBottom: 60,
   },
   welcomeText: {
-    fontSize: 20,
+    fontSize: 24,
     fontWeight: '900',
     marginBottom: 5,
     textAlign: 'left',
@@ -135,7 +137,7 @@ const styles = StyleSheet.create({
   input: {
     flex: 1,
     paddingLeft: 10,
-    fontSize: 16,
+    fontSize: 20,
     textAlign: 'center',
   },
   searchButton: {
@@ -150,16 +152,6 @@ const styles = StyleSheet.create({
     height: 50,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  nextIcon: {
-    width: 50,
-    height: 50,
-    resizeMode: 'contain',
-  },
-  searchIcon: {
-    width: 30,
-    height: 30,
-    resizeMode: 'contain',
   },
   modalBackground: {
     flex: 1,

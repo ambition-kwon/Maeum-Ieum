@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { View, Text, StyleSheet, Image, Animated } from 'react-native';
+import Octicons from 'react-native-vector-icons/Octicons';
 
 export default function RegisterComplete() {
   const [countdown, setCountdown] = useState(3); // 초기 카운트다운 값
@@ -43,8 +44,8 @@ export default function RegisterComplete() {
 
   return (
     <View style={styles.container}>
-      <Animated.View style={[styles.imageContainer, animatedStyle]}>
-        <Image source={require('./src/assets/icons/check.png')} style={styles.image} />
+      <Animated.View style={[styles.iconContainer, animatedStyle]}>
+        <Octicons name="check-circle-fill" size={100} color="#FCCB02" />
       </Animated.View>
       <Text style={styles.mainText}>등록이 완료되었습니다</Text>
       <Text style={styles.subText}>{countdown}초 후에 자동으로 페이지가 닫힙니다</Text>
@@ -59,7 +60,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: '#ffffff',
   },
-  imageContainer: {
+  iconContainer: {
     marginBottom: 40,
   },
   image: {

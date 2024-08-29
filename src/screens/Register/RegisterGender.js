@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
+import IoniconsIcons from 'react-native-vector-icons/Ionicons';
 
 export default function RegisterGender() {
   const [selectedGender, setSelectedGender] = useState(null);
@@ -35,7 +36,7 @@ export default function RegisterGender() {
           ]}
           onPress={() => handleGenderPress('male')}
         >
-          <Image source={require('./src/assets/icons/male.png')} style={styles.genderIcon} />
+          <Image source={require('../../assets/icons/male.png')} style={styles.genderIcon} />
         </TouchableOpacity>
         <TouchableOpacity
           style={[
@@ -44,11 +45,11 @@ export default function RegisterGender() {
           ]}
           onPress={() => handleGenderPress('female')}
         >
-          <Image source={require('./src/assets/icons/female.png')} style={styles.genderIcon} />
+          <Image source={require('../../assets/icons/female.png')} style={styles.genderIcon} />
         </TouchableOpacity>
       </View>
       <TouchableOpacity style={styles.nextIconContainer} onPress={handleNextPress} activeOpacity={0.7}>
-        <Image source={require('./src/assets/icons/next.png')} style={styles.nextIcon} />
+        <IoniconsIcons name="arrow-forward-circle" size={50} color="#FCCB02" />
       </TouchableOpacity>
     </View>
   );
@@ -87,7 +88,7 @@ const styles = StyleSheet.create({
     marginBottom: 60,
   },
   welcomeText: {
-    fontSize: 20,
+    fontSize: 28,
     fontWeight: '900',
     textAlign: 'left',
     color: '#000',
@@ -123,10 +124,5 @@ const styles = StyleSheet.create({
     height: 50,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  nextIcon: {
-    width: 50,
-    height: 50,
-    resizeMode: 'contain',
   },
 });

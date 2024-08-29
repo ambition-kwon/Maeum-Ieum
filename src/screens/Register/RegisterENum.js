@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, StyleSheet, Image, TouchableOpacity } from 'react-native';
+import IoniconsIcons from 'react-native-vector-icons/Ionicons';
 
 export default function RegisterENum() {
   const handleNextPress = () => {
@@ -36,6 +37,7 @@ export default function RegisterENum() {
             style={styles.input}
             placeholder="전화번호를 입력해주세요"
             placeholderTextColor="#B0B0B0"
+            keyboardType="numeric"
           />
         </View>
       </View>
@@ -49,7 +51,7 @@ export default function RegisterENum() {
         </View>
       </View>
       <TouchableOpacity style={styles.nextIconContainer} onPress={handleNextPress} activeOpacity={0.7}>
-        <Image source={require('./src/assets/icons/next.png')} style={styles.nextIcon} />
+        <IoniconsIcons name="arrow-forward-circle" size={50} color="#FCCB02" />
       </TouchableOpacity>
     </View>
   );
@@ -88,7 +90,7 @@ const styles = StyleSheet.create({
     marginBottom: 60,
   },
   welcomeText: {
-    fontSize: 20,
+    fontSize: 24,
     fontWeight: '900',
     marginBottom: 5,
     textAlign: 'left',
@@ -107,7 +109,7 @@ const styles = StyleSheet.create({
   input: {
     flex: 1,
     paddingLeft: 10,
-    fontSize: 16,
+    fontSize: 20,
     textAlign: 'center',
   },
   nextIconContainer: {
@@ -118,10 +120,5 @@ const styles = StyleSheet.create({
     height: 50,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  nextIcon: {
-    width: 50,
-    height: 50,
-    resizeMode: 'contain',
   },
 });
