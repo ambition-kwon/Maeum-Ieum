@@ -7,10 +7,10 @@ const Header = () => {
         <View style={styles.header}>
             <View style={styles.iconContainer}>
                 <TouchableOpacity style={styles.circleButton}>
-                    <Text style={styles.circleButtonText}>N</Text>
+                    <Image source={require('../../assets/icons/notice.png')} style={styles.iconImage} />
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.circleButton}>
-                    <Text style={styles.circleButtonText}>S</Text>
+                    <Image source={require('../../assets/icons/setting.png')} style={styles.iconImage} />
                 </TouchableOpacity>
             </View>
             <View style={styles.profileContainer}>
@@ -40,7 +40,7 @@ const SeniorCard = ({ uid, onCopy }) => {
             <View style={styles.cardIdContainer}>
                 <Text style={styles.cardId}>uid : {uid}</Text>
                 <TouchableOpacity style={styles.copyButton} onPress={copyToClipboard}>
-                    <Text style={styles.copyButtonText}>복사</Text>
+                    <Image source={require('../../assets/icons/copy.png')} style={styles.iconImageSmall} />
                 </TouchableOpacity>
             </View>
             <View style={styles.cardContent}>
@@ -170,10 +170,15 @@ const styles = StyleSheet.create({
         shadowRadius: 3.84,
         elevation: 5,
     },
-    circleButtonText: {
-        fontSize: 18,
-        fontWeight: 'bold',
-        color: '#000',
+    iconImage: {
+        width: 24,
+        height: 24,
+        resizeMode: 'contain',
+    },
+    iconImageSmall: {
+        width: 20,
+        height: 20,
+        resizeMode: 'contain',
     },
     card: {
         backgroundColor: '#FFF',
@@ -199,9 +204,6 @@ const styles = StyleSheet.create({
     },
     copyButton: {
         backgroundColor: '#FFF',
-        borderColor: '#000',
-        borderWidth: 1,
-        borderRadius: 5,
         padding: 2,
         marginLeft: 6,
     },
