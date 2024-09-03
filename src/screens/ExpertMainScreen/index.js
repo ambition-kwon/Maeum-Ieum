@@ -1,5 +1,8 @@
 import React, { useState } from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity, ScrollView, Clipboard } from 'react-native';
+import FontistoIcon from 'react-native-vector-icons/Fontisto';
+import OcticonsIcon from 'react-native-vector-icons/Octicons';
+import FeatherIcon from 'react-native-vector-icons/Feather';
 
 // 전문가의 정보가 표시되는 header 영역
 const Header = () => {
@@ -7,10 +10,10 @@ const Header = () => {
         <View style={styles.header}>
             <View style={styles.iconContainer}>
                 <TouchableOpacity style={styles.circleButton}>
-                    <Image source={require('../../assets/icons/notice.png')} style={styles.iconImage} />
+                    <FontistoIcon name="bell" size={30} color="black" />
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.circleButton}>
-                    <Image source={require('../../assets/icons/setting.png')} style={styles.iconImage} />
+                    <OcticonsIcon name="gear" size={30} color="black" />
                 </TouchableOpacity>
             </View>
             <View style={styles.profileContainer}>
@@ -40,7 +43,7 @@ const SeniorCard = ({ uid, onCopy }) => {
             <View style={styles.cardIdContainer}>
                 <Text style={styles.cardId}>uid : {uid}</Text>
                 <TouchableOpacity style={styles.copyButton} onPress={copyToClipboard}>
-                    <Image source={require('../../assets/icons/copy.png')} style={styles.iconImageSmall} />
+                    <FeatherIcon name="copy" size={16} color="black" />
                 </TouchableOpacity>
             </View>
             <View style={styles.cardContent}>
@@ -155,6 +158,7 @@ const styles = StyleSheet.create({
     iconContainer: {
         flexDirection: 'row',
         marginLeft: 'auto',
+        marginBottom: 15,
     },
     circleButton: {
         width: 40,
@@ -162,7 +166,6 @@ const styles = StyleSheet.create({
         borderRadius: 20,
         justifyContent: 'center',
         alignItems: 'center',
-        marginLeft: 15,
     },
     iconImage: {
         width: 24,
