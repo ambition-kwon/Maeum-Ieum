@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import IoniconsIcons from 'react-native-vector-icons/Ionicons';
 
 export default function RegisterGender() {
@@ -32,20 +32,22 @@ export default function RegisterGender() {
         <TouchableOpacity
           style={[
             styles.genderOption,
+            styles.maleOption,
             selectedGender === 'male' && styles.selectedMale,
           ]}
           onPress={() => handleGenderPress('male')}
         >
-          <Image source={require('../../assets/icons/male.png')} style={styles.genderIcon} />
+          <IoniconsIcons name="male" size={100} color="#58A6FF" />
         </TouchableOpacity>
         <TouchableOpacity
           style={[
             styles.genderOption,
+            styles.femaleOption,
             selectedGender === 'female' && styles.selectedFemale,
           ]}
           onPress={() => handleGenderPress('female')}
         >
-          <Image source={require('../../assets/icons/female.png')} style={styles.genderIcon} />
+          <IoniconsIcons name="female" size={100} color="#D99BFF" />
         </TouchableOpacity>
       </View>
       <TouchableOpacity style={styles.nextIconContainer} onPress={handleNextPress} activeOpacity={0.7}>
@@ -101,20 +103,22 @@ const styles = StyleSheet.create({
   },
   genderOption: {
     margin: 30,
-    borderWidth: 2,
-    borderRadius: 50,
+    borderWidth: 4,
+    borderRadius: 100,
     borderColor: 'transparent',
+    padding: 10,
+  },
+  maleOption: {
+    backgroundColor: '#EAF2FA',
+  },
+  femaleOption: {
+    backgroundColor: '#F7F0FA',
   },
   selectedMale: {
-    borderColor: '#58A6FF',
+    borderColor: '#87CEEB',
   },
   selectedFemale: {
     borderColor: '#D99BFF',
-  },
-  genderIcon: {
-    width: 100,
-    height: 100,
-    resizeMode: 'contain',
   },
   nextIconContainer: {
     position: 'absolute',
