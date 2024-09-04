@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
+import FontAwesome5Icon from 'react-native-vector-icons/FontAwesome5';
 
 const EditInfo = () => {
   const handleProfilePress = () => {
@@ -33,45 +34,57 @@ const EditInfo = () => {
         <Text style={styles.sectionTitle}>기본정보</Text>
         <View style={styles.infoRow}>
           <Text style={styles.infoLabel}>이름</Text>
-          <Text style={styles.infoValue}>정진아</Text>
-          <TouchableOpacity>
-            <Image source={require('../../assets/icons/edit.png')} style={styles.editIcon} />
-          </TouchableOpacity>
+          <View style={styles.infoTextWithIcon}>
+            <Text style={styles.infoValue}>정진아</Text>
+            <TouchableOpacity>
+              <FontAwesome5Icon name="pen" size={16} color="black" />
+            </TouchableOpacity>
+          </View>
         </View>
         <View style={styles.infoRow}>
           <Text style={styles.infoLabel}>성별</Text>
-          <Text style={styles.infoValue}>여</Text>
-          <TouchableOpacity>
-            <Image source={require('../../assets/icons/edit.png')} style={styles.editIcon} />
-          </TouchableOpacity>
+          <View style={styles.infoTextWithIcon}>
+            <Text style={styles.infoValue}>여</Text>
+            <TouchableOpacity>
+              <FontAwesome5Icon name="pen" size={16} color="black" />
+            </TouchableOpacity>
+          </View>
         </View>
         <View style={styles.infoRow}>
           <Text style={styles.infoLabel}>생년월일</Text>
-          <Text style={styles.infoValue}>1997년 4월 26일</Text>
-          <TouchableOpacity>
-            <Image source={require('../../assets/icons/edit.png')} style={styles.editIcon} />
-          </TouchableOpacity>
+          <View style={styles.infoTextWithIcon}>
+            <Text style={styles.infoValue}>1997년 4월 26일</Text>
+            <TouchableOpacity>
+              <FontAwesome5Icon name="pen" size={16} color="black" />
+            </TouchableOpacity>
+          </View>
         </View>
         <View style={styles.infoRow}>
           <Text style={styles.infoLabel}>주거지</Text>
-          <Text style={styles.infoValue}>제주시 제주대학로 113, 404호</Text>
-          <TouchableOpacity>
-            <Image source={require('../../assets/icons/edit.png')} style={styles.editIcon} />
-          </TouchableOpacity>
+          <View style={styles.infoTextWithIcon}>
+            <Text style={styles.infoValue}>제주시 제주대학로 113, 404호</Text>
+            <TouchableOpacity>
+              <FontAwesome5Icon name="pen" size={16} color="black" />
+            </TouchableOpacity>
+          </View>
         </View>
         <View style={styles.infoRow}>
           <Text style={styles.infoLabel}>소속기관</Text>
-          <Text style={styles.infoValue}>큰 푸른 숲 요양원</Text>
-          <TouchableOpacity>
-            <Image source={require('../../assets/icons/edit.png')} style={styles.editIcon} />
-          </TouchableOpacity>
+          <View style={styles.infoTextWithIcon}>
+            <Text style={styles.infoValue}>큰 푸른 숲 요양원</Text>
+            <TouchableOpacity>
+              <FontAwesome5Icon name="pen" size={16} color="black" />
+            </TouchableOpacity>
+          </View>
         </View>
         <View style={styles.infoRow}>
           <Text style={styles.infoLabel}>연락처</Text>
-          <Text style={styles.infoValue}>010-6844-3536</Text>
-          <TouchableOpacity>
-            <Image source={require('../../assets/icons/edit.png')} style={styles.editIcon} />
-          </TouchableOpacity>
+          <View style={styles.infoTextWithIcon}>
+            <Text style={styles.infoValue}>010-6844-3536</Text>
+            <TouchableOpacity>
+              <FontAwesome5Icon name="pen" size={16} color="black" />
+            </TouchableOpacity>
+          </View>
         </View>
       </View>
     </View>
@@ -145,10 +158,14 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#999',
   },
+  infoTextWithIcon: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
   infoValue: {
-    flex: 1,
     fontSize: 16,
     color: '#000',
+    marginRight: 8,
   },
   editIcon: {
     width: 16,

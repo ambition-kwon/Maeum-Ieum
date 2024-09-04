@@ -2,6 +2,7 @@
 // 정량적 분석 상태 입력 받으면 매우 나쁨, 좋음 등의 상태 글자 색깔 같이 바뀌게 추가할 것
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, TextInput, Image, ScrollView, Dimensions } from 'react-native';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 const WeeklyReport = () => {
   const [selectedTab, setSelectedTab] = useState('quantitative'); // 기본적으로 '정량적 분석' 선택
@@ -12,37 +13,37 @@ const WeeklyReport = () => {
     {
       title: '건강 상태 지표',
       description: '건강 상태 지표에 대한 2~3줄 정도의 간략한 요약이 담기면 좋겠네요. 이상입니다. 수고하셨어요',
-      icon: require('../../assets/icons/Worst.png'),
+      icon: 'emoticon-sad-outline',
     },
     {
       title: '사회적 연결성 지표',
       description: '사회적 연결성 지표에 대한 분석 결과가 여기에 표시됩니다.',
-      icon: require('../../assets/icons/Dislike.png'),
+      icon: 'emoticon-neutral-outline',
     },
     {
       title: '심리적 안정 지표',
       description: '심리적 안정 지표에 대한 분석 결과가 여기에 표시됩니다.',
-      icon: require('../../assets/icons/Neutral.png'),
+      icon: 'emoticon-happy-outline',
     },
     {
       title: '생활 만족도 지표',
       description: '생활 만족도 지표에 대한 분석 결과가 여기에 표시됩니다.',
-      icon: require('../../assets/icons/Good.png'),
+      icon: 'emoticon-outline',
     },
     {
       title: '인지 기능 지표',
       description: '인지 기능 지표에 대한 분석 결과가 여기에 표시됩니다.',
-      icon: require('../../assets/icons/Best.png'),
+      icon: 'emoticon-excited-outline',
     },
     {
       title: '활동 수준 지표',
       description: '활동 수준 지표에 대한 분석 결과가 여기에 표시됩니다.',
-      icon: require('../../assets/icons/Worst.png'),
+      icon: 'emoticon-neutral-outline',
     },
     {
       title: '필요 지원 지표',
       description: '필요 지원 지표에 대한 분석 결과가 여기에 표시됩니다.',
-      icon: require('../../assets/icons/Best.png'),
+      icon: 'emoticon-excited-outline',
     },
   ];
 
@@ -75,7 +76,7 @@ const WeeklyReport = () => {
             </TouchableOpacity>
             <Text style={styles.resultTitle}>{title}</Text>
             <View style={styles.resultIconContainer}>
-              <Image source={icon} style={styles.resultIcon} />
+              <MaterialCommunityIcons name={icon} size={70} color="#000" />
             </View>
             <Text style={styles.resultStatus}>매우 나쁨</Text>
             <Text style={styles.resultDescription}>{description}</Text>

@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image, Animated, Easing, ScrollView } from 'react-native';
-import SimpleLineIconsIcon from 'react-native-vector-icons/SimpleLineIcons';
+import SimpleLineIcons from 'react-native-vector-icons/SimpleLineIcons';
 import IoniconsIcon from 'react-native-vector-icons/Ionicons';
 
 const dummyData = [
@@ -65,7 +65,7 @@ export default function Chat() {
               {isRecording ? (
                 <IoniconsIcon name="stop-outline" size={40} color="red" />
               ) : (
-                <SimpleLineIconsIcon name="microphone" size={40} color="red" />
+                <SimpleLineIcons name="microphone" size={40} color="red" />
               )}
             </TouchableOpacity>
           </View>
@@ -78,11 +78,11 @@ export default function Chat() {
 
       <Image
         source={require('../../assets/icons/aiicon.png')}
-        style={styles.profileImageBottomRight}
+        style={styles.profileImageTopLeft}
       />
       <Image
         source={require('../../assets/icons/aiicon.png')}
-        style={styles.profileImageTopLeft}
+        style={styles.profileImageBottomRight}
       />
     </View>
   );

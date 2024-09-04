@@ -4,6 +4,7 @@ import { useNavigation } from '@react-navigation/native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import IoniconsIcons from 'react-native-vector-icons/Ionicons';
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
 
 export default function Signup() {
   const [username, setUsername] = useState('');
@@ -39,6 +40,7 @@ export default function Signup() {
             onChangeText={setUsername}
             placeholderTextColor="#B0B0B0"
           />
+          <FontAwesome name="check" size={20} color="#40CC56" style={styles.checkIconOutside} />
           <TouchableOpacity style={styles.duplication}>
             <Text style={styles.duplicationText}>중복확인</Text>
           </TouchableOpacity>
@@ -117,6 +119,9 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingLeft: 10,
     fontSize: 20,
+  },
+  checkIconOutside: {
+    marginRight: 5,
   },
   duplication: {
     backgroundColor: '#FCCB02',
