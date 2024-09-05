@@ -1,6 +1,15 @@
 import React, { useState } from 'react';
-import { View, Text, Image, TouchableOpacity, TextInput, StyleSheet, FlatList, TouchableWithoutFeedback } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  TextInput,
+  StyleSheet,
+  FlatList,
+  TouchableWithoutFeedback,
+  Alert,
+} from "react-native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 import IoniconsIcons from 'react-native-vector-icons/Ionicons';
 import SimpleLineIcons from 'react-native-vector-icons/SimpleLineIcons';
 
@@ -18,10 +27,23 @@ export default function SignupOrg() {
   const [filteredData, setFilteredData] = useState([]);
   const [showList, setShowList] = useState(false);
   const navigation = useNavigation();
+  const route = useRoute();
+  const { username, password, realname, selectedGender, formattedDate } = route.params;
 
   const handleNextPress = () => {
-    console.log('Next icon pressed');
-    navigation.navigate('SignupImg');
+    if(searchText !== '' && showList === false){
+      navigation.navigate('SignupImg',{
+        username: username,
+        password: password,
+        realname: realname,
+        selectedGender: selectedGender,
+        formattedDate: formattedDate,
+        organization: searchText
+      });
+    }
+    else{
+      Alert.alert('오류', '소속기관을 선택하지 않았습니다.\n다시 한 번 확인해 주세요.');
+    }
   };
 
   const handleSearch = (text) => {

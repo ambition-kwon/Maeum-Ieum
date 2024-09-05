@@ -1,15 +1,27 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, StyleSheet, Image, TouchableOpacity } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import IoniconsIcons from 'react-native-vector-icons/Ionicons';
+import React, { useState } from "react";
+import { Alert, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { useNavigation, useRoute } from "@react-navigation/native";
+import IoniconsIcons from "react-native-vector-icons/Ionicons";
 
 export default function SignupName() {
   const navigation = useNavigation();
-
+  const [realname, setRealname] = useState("");
+  const route = useRoute();
+  const { username, password } = route.params;
   const handleNextPress = () => {
-    console.log('Next icon pressed');
-    navigation.navigate('SignupGender');
+    if(realname !== ' ' && realname.length > 0){
+    navigation.navigate('SignupGender',
+      {
+        username: username,
+        password: password,
+        realname: realname,
+      });
+    }
+    else{
+      Alert.alert('오류', '이름 형식에 어긋납니다.\n다시 한 번 확인해 주세요.');
+    }
   };
+
 
   return (
     <View style={styles.container}>
@@ -31,6 +43,8 @@ export default function SignupName() {
             style={styles.input}
             placeholder="성함을 입력해주세요"
             placeholderTextColor="#B0B0B0"
+            value={realname}
+            onChangeText={setRealname}
           />
         </View>
       </View>
