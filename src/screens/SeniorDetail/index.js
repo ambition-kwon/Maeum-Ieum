@@ -5,6 +5,7 @@ import { Picker } from '@react-native-picker/picker';
 const SeniorDetail = () => {
   const [selectedDay, setSelectedDay] = useState('수요일마다 받을래요');
   const [isEditing, setIsEditing] = useState(false);
+  // 이것저것 테스트 해볼려고 추가한 임시 데이터라서 나중에 api 명세서 나오면 수정해야 함
   const [profileData, setProfileData] = useState({
     name: '권혁원',
     gender: '남',
@@ -31,7 +32,9 @@ const SeniorDetail = () => {
   };
 
   const handleProfilePress = () => {
-    console.log('프로필 이미지 클릭됨');
+    if (isEditing) {
+      console.log('프로필 이미지 클릭됨');
+    }
   };
 
   return (
@@ -43,9 +46,13 @@ const SeniorDetail = () => {
         <Text style={styles.headerTitle}>어르신 상세정보</Text>
 
         <View style={styles.profileSection}>
-          <TouchableOpacity style={styles.profileImageButton} onPress={handleProfilePress}>
+          <TouchableOpacity
+            style={styles.profileImageButton}
+            onPress={handleProfilePress}
+            disabled={!isEditing} // 수정 모드가 아닐 때 비활성화
+          >
             <Image
-              source={{ uri: 'https://via.placeholder.com/150' }} // Replace with the actual image URL
+              source={{ uri: 'https://via.placeholder.com/150' }} // 실제 이미지 URL로 교체
               style={styles.profileImage}
             />
           </TouchableOpacity>
@@ -147,62 +154,6 @@ const SeniorDetail = () => {
         </View>
       </View>
 
-      <View style={styles.emergencyContactSection}>
-        <Text style={styles.sectionTitle}>긴급연락처</Text>
-        <View style={styles.infoRow}>
-          <Text style={styles.infoLabel}>이름</Text>
-          {isEditing ? (
-            <TextInput
-              style={styles.input}
-              value={profileData.emergencyContactName}
-              onChangeText={(text) => handleChange('emergencyContactName', text)}
-            />
-          ) : (
-            <Text style={styles.infoValue}>{profileData.emergencyContactName}</Text>
-          )}
-        </View>
-        <View style={styles.infoRow}>
-          <Text style={styles.infoLabel}>연락처</Text>
-          {isEditing ? (
-            <TextInput
-              style={styles.input}
-              value={profileData.emergencyContactPhone}
-              onChangeText={(text) => handleChange('emergencyContactPhone', text)}
-            />
-          ) : (
-            <Text style={styles.infoValue}>{profileData.emergencyContactPhone}</Text>
-          )}
-        </View>
-        <View style={styles.infoRow}>
-          <Text style={styles.infoLabel}>관계</Text>
-          {isEditing ? (
-            <TextInput
-              style={styles.input}
-              value={profileData.emergencyContactRelation}
-              onChangeText={(text) => handleChange('emergencyContactRelation', text)}
-            />
-          ) : (
-            <Text style={styles.infoValue}>{profileData.emergencyContactRelation}</Text>
-          )}
-        </View>
-      </View>
-
-      <View style={styles.aiAssistantSection}>
-        <Text style={styles.sectionTitle}>AI Assistant</Text>
-        <View style={styles.infoRow}>
-          <Text style={styles.infoLabel}>이름</Text>
-          {isEditing ? (
-            <TextInput
-              style={styles.input}
-              value={profileData.aiAssistantName}
-              onChangeText={(text) => handleChange('aiAssistantName', text)}
-            />
-          ) : (
-            <Text style={styles.infoValue}>{profileData.aiAssistantName}</Text>
-          )}
-        </View>
-      </View>
-
       <View style={styles.reportSection}>
         <Text style={styles.sectionTitle}>주간 보고서</Text>
         <View style={styles.customPickerContainer}>
@@ -210,7 +161,7 @@ const SeniorDetail = () => {
             selectedValue={selectedDay}
             style={styles.customPicker}
             onValueChange={(itemValue) => setSelectedDay(itemValue)}
-            enabled={isEditing} // Enable/Disable the picker based on editing state
+            enabled={isEditing} // 수정 모드일 때만 선택 가능
           >
             <Picker.Item label="월요일마다 받을래요" value="월요일마다 받을래요" />
             <Picker.Item label="화요일마다 받을래요" value="화요일마다 받을래요" />
@@ -221,32 +172,16 @@ const SeniorDetail = () => {
             <Picker.Item label="일요일마다 받을래요" value="일요일마다 받을래요" />
           </Picker>
         </View>
-        <View style={styles.customInputContainer}>
-          {isEditing ? (
-            <TextInput
-              style={styles.customInput}
-              value="2024.07.07(수)"
-              editable={isEditing}
-            />
-          ) : (
-            <Text style={styles.customInput}>2024.07.07(수)</Text>
-          )}
-        </View>
+        <TouchableOpacity style={styles.customButton}>
+          <Text style={styles.customButtonText}>주간 보고서 확인</Text>
+        </TouchableOpacity>
       </View>
 
       <View style={styles.reportSection}>
         <Text style={styles.sectionTitle}>월간 보고서</Text>
-        <View style={styles.customInputContainer}>
-          {isEditing ? (
-            <TextInput
-              style={styles.customInput}
-              value="2024.06"
-              editable={isEditing}
-            />
-          ) : (
-            <Text style={styles.customInput}>2024.06</Text>
-          )}
-        </View>
+         <TouchableOpacity style={styles.customButton}>
+           <Text style={styles.customButtonText}>월간 보고서 확인</Text>
+         </TouchableOpacity>
       </View>
     </ScrollView>
   );
@@ -342,14 +277,6 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: '#ccc',
   },
-  emergencyContactSection: {
-    marginTop: 20,
-    paddingHorizontal: 20,
-  },
-  aiAssistantSection: {
-    marginTop: 20,
-    paddingHorizontal: 20,
-  },
   reportSection: {
     marginTop: 20,
     paddingHorizontal: 20,
@@ -365,7 +292,7 @@ const styles = StyleSheet.create({
     color: '#000',
     fontWeight: 'bold',
   },
-  customInputContainer: {
+  customButton: {
     borderWidth: 1,
     borderColor: '#DADADA',
     borderRadius: 8,
@@ -373,7 +300,7 @@ const styles = StyleSheet.create({
     paddingVertical: 15,
     marginVertical: 10,
   },
-  customInput: {
+  customButtonText: {
     color: '#000',
     fontSize: 16,
   },
