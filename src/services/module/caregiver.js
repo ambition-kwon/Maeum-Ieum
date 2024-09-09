@@ -19,12 +19,7 @@ const caregiver = {
     });
   },
   info: () => {
-    return axiosInstance.get('/caregivers', {
-      params: {
-        cursor: '',
-        limit: 30,
-      },
-    });
+    return axiosInstance.get(`/caregivers`);
   },
 };
 

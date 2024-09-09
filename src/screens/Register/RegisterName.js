@@ -1,10 +1,24 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, StyleSheet, Image, TouchableOpacity } from 'react-native';
+import React, {useState} from 'react';
+import {
+  Alert,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import IoniconsIcons from 'react-native-vector-icons/Ionicons';
+import {useNavigation} from '@react-navigation/native';
 
 export default function RegisterName() {
-  const handleNextPress = () => {
-    console.log('Next icon pressed');
+  const navigation = useNavigation();
+  const [name, setName] = useState('');
+  const handleNavigate = () => {
+    if (name.length > 0 && name !== '') {
+      navigation.navigate('SignupGenderElder');
+    } else {
+      Alert.alert('오류', '이름 형식에 어긋납니다.\n다시 한 번 확인해 주세요.');
+    }
   };
 
   return (
@@ -28,10 +42,15 @@ export default function RegisterName() {
             style={styles.input}
             placeholder="성함을 입력해주세요"
             placeholderTextColor="#B0B0B0"
+            value={name}
+            onChangeText={text => setName(text.trim())}
           />
         </View>
       </View>
-      <TouchableOpacity style={styles.nextIconContainer} onPress={handleNextPress} activeOpacity={0.7}>
+      <TouchableOpacity
+        style={styles.nextIconContainer}
+        onPress={handleNavigate}
+        activeOpacity={0.7}>
         <IoniconsIcons name="arrow-forward-circle" size={50} color="#FCCB02" />
       </TouchableOpacity>
     </View>

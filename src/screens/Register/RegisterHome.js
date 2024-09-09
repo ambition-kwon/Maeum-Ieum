@@ -1,18 +1,41 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, StyleSheet, Image, TouchableOpacity, Modal, TouchableWithoutFeedback } from 'react-native';
+import React, {useState} from 'react';
+import {
+  Alert,
+  Modal,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  TouchableWithoutFeedback,
+  View,
+} from 'react-native';
 import Postcode from '@actbase/react-daum-postcode';
 import IoniconsIcons from 'react-native-vector-icons/Ionicons';
 import SimpleLineIcons from 'react-native-vector-icons/SimpleLineIcons';
+import {useNavigation} from '@react-navigation/native';
 
 export default function RegisterHome() {
   const [address, setAddress] = useState('');
+  const [detailAddress, setDetailAddress] = useState('');
   const [showPostcode, setShowPostcode] = useState(false);
-
+  const navigation = useNavigation();
   const handleNextPress = () => {
-    console.log('Next icon pressed');
+    if (address === '') {
+      Alert.alert(
+        '오류',
+        '주소를 입력하지 않았습니다.\n다시 한 번 확인해 주세요.',
+      );
+    } else if (detailAddress === '') {
+      Alert.alert(
+        '오류',
+        '상세주소를 입력하지 않았습니다.\n다시 한 번 확인해 주세요.',
+      );
+    } else {
+      navigation.navigate('SignupNumElder');
+    }
   };
 
-  const handleAddressSelect = (data) => {
+  const handleAddressSelect = data => {
     setAddress(data.address);
     setShowPostcode(false);
   };
@@ -41,7 +64,9 @@ export default function RegisterHome() {
             value={address}
             editable={false}
           />
-          <TouchableOpacity style={styles.searchButton} onPress={() => setShowPostcode(true)}>
+          <TouchableOpacity
+            style={styles.searchButton}
+            onPress={() => setShowPostcode(true)}>
             <SimpleLineIcons name="magnifier" size={20} color="#58A6FF" />
           </TouchableOpacity>
         </View>
@@ -52,10 +77,15 @@ export default function RegisterHome() {
             style={styles.input}
             placeholder="상세 주소를 입력해주세요"
             placeholderTextColor="#B0B0B0"
+            value={detailAddress}
+            onChangeText={setDetailAddress}
           />
         </View>
       </View>
-      <TouchableOpacity style={styles.nextIconContainer} onPress={handleNextPress} activeOpacity={0.7}>
+      <TouchableOpacity
+        style={styles.nextIconContainer}
+        onPress={handleNextPress}
+        activeOpacity={0.7}>
         <IoniconsIcons name="arrow-forward-circle" size={50} color="#FCCB02" />
       </TouchableOpacity>
 
@@ -64,15 +94,14 @@ export default function RegisterHome() {
         transparent={true}
         animationType="slide"
         visible={showPostcode}
-        onRequestClose={() => setShowPostcode(false)}
-      >
+        onRequestClose={() => setShowPostcode(false)}>
         <TouchableWithoutFeedback onPress={() => setShowPostcode(false)}>
           <View style={styles.modalBackground}>
             <TouchableWithoutFeedback>
               <View style={styles.modalContainer}>
                 <Postcode
-                  style={{ flex: 1 }}
-                  jsOptions={{ animation: true }}
+                  style={{flex: 1}}
+                  jsOptions={{animation: true}}
                   onSelected={handleAddressSelect}
                 />
               </View>

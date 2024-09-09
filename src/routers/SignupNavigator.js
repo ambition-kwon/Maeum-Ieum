@@ -13,6 +13,14 @@ import SignupImg from '../screens/Signup/SignupImg.js';
 import SignupNum from '../screens/Signup/SignupNum.js';
 import AdminApprove from '../screens/Signup/AdminApprove.js';
 import ExpertMainScreen from '../screens/ExpertMainScreen';
+import RegisterENum from '../screens/Register/RegisterENum';
+import RegisterName from '../screens/Register/RegisterName';
+import RegisterGender from '../screens/Register/RegisterGender';
+import RegisterDate from '../screens/Register/RegisterDate';
+import RegisterHome from '../screens/Register/RegisterHome';
+import RegisterImg from '../screens/Register/RegisterImg';
+import RegisterNum from '../screens/Register/RegisterNum';
+import RegisterNote from '../screens/Register/RegisterNote';
 
 const Stack = createStackNavigator();
 
@@ -78,6 +86,46 @@ export default function SignupNavigator() {
         <Stack.Screen
           name="ExpertMainScreen"
           component={ExpertMainScreen}
+          options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name="SignupNameElder"
+          component={RegisterName}
+          options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name="SignupGenderElder"
+          component={RegisterGender}
+          options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name="SignupDateElder"
+          component={RegisterDate}
+          options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name="SignupAddressElder"
+          component={RegisterHome}
+          options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name="SignupNumElder"
+          component={RegisterENum}
+          options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name="SignupImgElder"
+          component={RegisterImg}
+          options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name="SignupContactElder"
+          component={RegisterNum}
+          options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name="SignupNoteElder"
+          component={RegisterNote}
           options={{headerShown: false}}
         />
       </Stack.Navigator>

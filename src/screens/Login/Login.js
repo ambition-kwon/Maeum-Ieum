@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   View,
   Text,
@@ -21,12 +21,20 @@ export default function Login() {
     try {
       const response = await caregiver.login(username, password);
       await AsyncStorage.setItem('token', response.headers.getAuthorization());
-      console.log(response.data);
+      console.log(JSON.stringify(response.headers, null, 2));
       navigation.navigate('ExpertMainScreen');
     } catch (error) {
       Alert.alert('오류', '로그인이 실패하였습니다.\n계정을 재 확인해 주세요.');
     }
   };
+
+  // 토큰 있을 경우 자동로그인
+  useEffect(() => {
+    const token = AsyncStorage.getItem('token');
+    if (token !== null) {
+      navigation.navigate('ExpertMainScreen');
+    }
+  }, []);
 
   return (
     <View style={styles.container}>

@@ -20,26 +20,32 @@ export default function Signup() {
   const [checkPassword, setCheckPassword] = useState('');
   const [isVerified, setIsVerified] = useState(false);
   const navigation = useNavigation();
+
+  //인증 후 아이디 바꿨을 시, 초기화 로직
   useEffect(() => {
-    //인증 후 유저네임 바꾸면 인증여부까지 초기화 하도록 로직 구현
     setIsVerified(false);
   }, [username]);
   const handleCheckUsername = async () => {
     if (username !== '') {
       try {
-        const {data} = await caregiver.checkUsername(username);
-        if (data.duplicated === false) {
-          setIsVerified(true);
-          Alert.alert('확인완료', '사용 가능한 아이디입니다.');
+        await caregiver.signup({username: username});
+      } catch (error) {
+        if (error.response.data.data.username === undefined) {
+          const response = await caregiver.checkUsername(username);
+          if (response.data.data.duplicated === false) {
+            Alert.alert('확인완료', '사용 가능한 아이디입니다.');
+            setIsVerified(true);
+          } else {
+            Alert.alert(
+              '오류',
+              '중복된 아이디입니다.\n다른 아이디를 입력해주세요.',
+            );
+            setIsVerified(false);
+          }
         } else {
           setIsVerified(false);
-          Alert.alert(
-            '오류',
-            '중복된 아이디입니다.\n다른 아이디를 입력해주세요.',
-          );
+          Alert.alert('오류', error.response.data.data.username);
         }
-      } catch (error) {
-        console.log(error.response.data);
       }
     } else {
       Alert.alert(
@@ -49,21 +55,29 @@ export default function Signup() {
     }
   };
 
-  const handleNextPress = () => {
-    if (password !== '' && password === checkPassword && isVerified) {
-      navigation.navigate('SignupName', {
-        username: username,
-        password: password,
-      });
-    } else if (password !== checkPassword && isVerified) {
-      Alert.alert(
-        '오류',
-        '비밀번호가 일치하지 않습니다.\n다시 한 번 확인해 주세요.',
-      );
-    } else if (password === checkPassword && !isVerified) {
-      Alert.alert('오류', '아이디 중복확인을 진행해주세요.');
-    } else {
-      Alert.alert('오류', '입력 내용을 다시 한 번 확인해 주세요.');
+  const handleNextPress = async () => {
+    try {
+      await caregiver.signup({password: password});
+    } catch (error) {
+      if (error.response.data.data.password === undefined) {
+        if (password !== '' && password === checkPassword && isVerified) {
+          navigation.navigate('SignupName', {
+            username: username,
+            password: password,
+          });
+        } else if (password !== checkPassword && isVerified) {
+          Alert.alert(
+            '오류',
+            '비밀번호가 일치하지 않습니다.\n다시 한 번 확인해 주세요.',
+          );
+        } else if (password === checkPassword && !isVerified) {
+          Alert.alert('오류', '아이디 중복확인을 진행해주세요.');
+        } else {
+          Alert.alert('오류', '입력 내용을 다시 한 번 확인해 주세요.');
+        }
+      } else {
+        Alert.alert('오류', error.response.data.data.password);
+      }
     }
   };
 

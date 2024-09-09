@@ -1,27 +1,31 @@
-import React, { useState } from "react";
-import { Alert, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
-import { useNavigation, useRoute } from "@react-navigation/native";
-import IoniconsIcons from "react-native-vector-icons/Ionicons";
+import React, {useState} from 'react';
+import {
+  Alert,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from 'react-native';
+import {useNavigation, useRoute} from '@react-navigation/native';
+import IoniconsIcons from 'react-native-vector-icons/Ionicons';
 
 export default function SignupName() {
   const navigation = useNavigation();
-  const [realname, setRealname] = useState("");
+  const [realname, setRealname] = useState('');
   const route = useRoute();
-  const { username, password } = route.params;
+  const {username, password} = route.params;
   const handleNextPress = () => {
-    if(realname !== ' ' && realname.length > 0){
-    navigation.navigate('SignupGender',
-      {
+    if (realname !== '' && realname.length > 0) {
+      navigation.navigate('SignupGender', {
         username: username,
         password: password,
         realname: realname,
       });
-    }
-    else{
+    } else {
       Alert.alert('오류', '이름 형식에 어긋납니다.\n다시 한 번 확인해 주세요.');
     }
   };
-
 
   return (
     <View style={styles.container}>
@@ -44,11 +48,14 @@ export default function SignupName() {
             placeholder="성함을 입력해주세요"
             placeholderTextColor="#B0B0B0"
             value={realname}
-            onChangeText={setRealname}
+            onChangeText={text => setRealname(text.trim())}
           />
         </View>
       </View>
-      <TouchableOpacity style={styles.nextIconContainer} onPress={handleNextPress} activeOpacity={0.7}>
+      <TouchableOpacity
+        style={styles.nextIconContainer}
+        onPress={handleNextPress}
+        activeOpacity={0.7}>
         <IoniconsIcons name="arrow-forward-circle" size={50} color="#FCCB02" />
       </TouchableOpacity>
     </View>

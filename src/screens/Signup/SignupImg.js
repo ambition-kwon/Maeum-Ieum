@@ -37,7 +37,10 @@ export default function SignupImg() {
         imageData: imageData,
       });
     } else {
-      Alert.alert('오류', '프로필 이미지를 첨부해주세요.');
+      Alert.alert(
+        '오류',
+        '프로필 사진을 선택하지 않았습니다.\n다시 한 번 확인해 주세요.',
+      );
     }
   };
 

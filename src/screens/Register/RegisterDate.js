@@ -1,22 +1,34 @@
-import React, { useState } from 'react';
-import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
+import React, {useState} from 'react';
+import {Alert, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import DatePicker from 'react-native-date-picker';
 import IoniconsIcons from 'react-native-vector-icons/Ionicons';
+import {useNavigation} from '@react-navigation/native';
 
 export default function RegisterDate() {
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [formattedDate, setFormattedDate] = useState('');
+  const navigation = useNavigation();
 
-  const handleConfirm = (date) => {
+  const handleConfirm = date => {
     setDatePickerVisibility(false);
     setSelectedDate(date);
-    const formatted = `${date.getFullYear()}년 ${date.getMonth() + 1}월 ${date.getDate()}일`
+    // BackEnd 요청 대로 포맷팅
+    const formatted = `${date.getFullYear()}-${String(
+      date.getMonth() + 1,
+    ).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
     setFormattedDate(formatted);
   };
 
   const handleNextPress = () => {
-    console.log('Next icon pressed');
+    if (formattedDate !== '') {
+      navigation.navigate('SignupAddressElder');
+    } else {
+      Alert.alert(
+        '오류',
+        '생년월일이 선택되지 않았습니다.\n다시 한 번 확인해 주세요.',
+      );
+    }
   };
 
   return (
@@ -35,7 +47,9 @@ export default function RegisterDate() {
         <Text style={styles.welcomeText}>생년월일을 입력해주세요</Text>
       </View>
 
-      <TouchableOpacity onPress={() => setDatePickerVisibility(true)} style={styles.dateDisplay}>
+      <TouchableOpacity
+        onPress={() => setDatePickerVisibility(true)}
+        style={styles.dateDisplay}>
         <Text style={styles.dateText}>{formattedDate || '생년월일 선택'}</Text>
       </TouchableOpacity>
 
@@ -56,7 +70,10 @@ export default function RegisterDate() {
         />
       )}
 
-      <TouchableOpacity style={styles.nextIconContainer} onPress={handleNextPress} activeOpacity={0.7}>
+      <TouchableOpacity
+        style={styles.nextIconContainer}
+        onPress={handleNextPress}
+        activeOpacity={0.7}>
         <IoniconsIcons name="arrow-forward-circle" size={50} color="#FCCB02" />
       </TouchableOpacity>
     </View>

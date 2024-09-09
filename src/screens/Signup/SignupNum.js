@@ -49,7 +49,10 @@ export default function SignupNum() {
         console.log(error);
       }
     } else {
-      Alert.alert('오류', '유효한 전화번호 형식이 아닙니다.');
+      Alert.alert(
+        '오류',
+        '유효한 전화번호 형식이 아닙니다.\n다시 한 번 확인해 주세요.',
+      );
     }
   };
 
@@ -75,7 +78,7 @@ export default function SignupNum() {
             placeholderTextColor="#B0B0B0"
             keyboardType="numeric"
             value={contact}
-            onChangeText={setContact}
+            onChangeText={text => setContact(text.trim)}
           />
         </View>
       </View>
