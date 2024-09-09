@@ -8,10 +8,12 @@ import {
   View,
 } from 'react-native';
 import IoniconsIcons from 'react-native-vector-icons/Ionicons';
-import {useNavigation} from '@react-navigation/native';
+import {useNavigation, useRoute} from '@react-navigation/native';
 
 export default function RegisterENum() {
   const navigation = useNavigation();
+  const route = useRoute();
+  const {name, gender, birthDate, homeAddress} = route.params;
   const isValidPhoneNumber = phoneNumber => {
     const phoneNumberPattern =
       /^(01[016789]-\d{3,4}-\d{4}|0[2-9]{1}\d{1}-\d{3,4}-\d{4})$/;
@@ -37,7 +39,15 @@ export default function RegisterENum() {
         '유효한 관계 형식이 아닙니다.\n다시 한 번 확인해 주세요.',
       );
     } else {
-      navigation.navigate('SignupImgElder');
+      navigation.navigate('SignupImgElder', {
+        name: name,
+        gender: gender,
+        birthDate: birthDate,
+        homeAddress: homeAddress,
+        emergencyName: emergencyName,
+        emergencyContact: emergencyContact,
+        relationship: relationship,
+      });
     }
   };
 

@@ -12,13 +12,15 @@ import {
 import Postcode from '@actbase/react-daum-postcode';
 import IoniconsIcons from 'react-native-vector-icons/Ionicons';
 import SimpleLineIcons from 'react-native-vector-icons/SimpleLineIcons';
-import {useNavigation} from '@react-navigation/native';
+import {useNavigation, useRoute} from '@react-navigation/native';
 
 export default function RegisterHome() {
   const [address, setAddress] = useState('');
   const [detailAddress, setDetailAddress] = useState('');
   const [showPostcode, setShowPostcode] = useState(false);
   const navigation = useNavigation();
+  const route = useRoute();
+  const {name, gender, birthDate} = route.params;
   const handleNextPress = () => {
     if (address === '') {
       Alert.alert(
@@ -31,7 +33,12 @@ export default function RegisterHome() {
         '상세주소를 입력하지 않았습니다.\n다시 한 번 확인해 주세요.',
       );
     } else {
-      navigation.navigate('SignupNumElder');
+      navigation.navigate('SignupNumElder', {
+        name: name,
+        gender: gender,
+        birthDate: birthDate,
+        homeAddress: address + ' ' + detailAddress,
+      });
     }
   };
 

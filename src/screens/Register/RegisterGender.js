@@ -1,7 +1,7 @@
 import React, {useState} from 'react';
 import {View, Text, TouchableOpacity, StyleSheet, Alert} from 'react-native';
 import IoniconsIcons from 'react-native-vector-icons/Ionicons';
-import {useNavigation} from '@react-navigation/native';
+import {useNavigation, useRoute} from '@react-navigation/native';
 
 export default function RegisterGender() {
   const [selectedGender, setSelectedGender] = useState(null);
@@ -9,9 +9,14 @@ export default function RegisterGender() {
   const handleGenderPress = gender => {
     setSelectedGender(gender);
   };
+  const route = useRoute();
+  const {name} = route.params;
   const handleNextPress = () => {
     if (selectedGender !== null) {
-      navigation.navigate('SignupDateElder');
+      navigation.navigate('SignupDateElder', {
+        name: name,
+        gender: selectedGender.toUpperCase(),
+      });
     } else {
       Alert.alert(
         '오류',

@@ -2,13 +2,15 @@ import React, {useState} from 'react';
 import {Alert, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import DatePicker from 'react-native-date-picker';
 import IoniconsIcons from 'react-native-vector-icons/Ionicons';
-import {useNavigation} from '@react-navigation/native';
+import {useNavigation, useRoute} from '@react-navigation/native';
 
 export default function RegisterDate() {
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [formattedDate, setFormattedDate] = useState('');
   const navigation = useNavigation();
+  const route = useRoute();
+  const {name, gender} = route.params;
 
   const handleConfirm = date => {
     setDatePickerVisibility(false);
@@ -22,7 +24,11 @@ export default function RegisterDate() {
 
   const handleNextPress = () => {
     if (formattedDate !== '') {
-      navigation.navigate('SignupAddressElder');
+      navigation.navigate('SignupAddressElder', {
+        name: name,
+        gender: gender,
+        birthDate: formattedDate,
+      });
     } else {
       Alert.alert(
         '오류',

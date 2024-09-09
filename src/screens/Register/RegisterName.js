@@ -15,7 +15,9 @@ export default function RegisterName() {
   const [name, setName] = useState('');
   const handleNavigate = () => {
     if (name.length > 0 && name !== '') {
-      navigation.navigate('SignupGenderElder');
+      navigation.navigate('SignupGenderElder', {
+        name: name,
+      });
     } else {
       Alert.alert('오류', '이름 형식에 어긋납니다.\n다시 한 번 확인해 주세요.');
     }

@@ -1,11 +1,13 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { View, Text, StyleSheet, Image, Animated } from 'react-native';
+import React, {useEffect, useRef, useState} from 'react';
+import {Animated, StyleSheet, Text, View} from 'react-native';
 import Octicons from 'react-native-vector-icons/Octicons';
+import {useNavigation} from '@react-navigation/native';
 
 export default function RegisterComplete() {
   const [countdown, setCountdown] = useState(3); // 초기 카운트다운 값
   const scaleAnim = useRef(new Animated.Value(1)).current; // 초기 스케일 값
-  const fadeAnim = useRef(new Animated.Value(0)).current; // 초기 투명도 값
+  const fadeAnim = useRef(new Animated.Value(0)).current; // 초기 투명도 값i
+  const navigation = useNavigation();
 
   useEffect(() => {
     // 페이드 인 애니메이션
@@ -24,7 +26,7 @@ export default function RegisterComplete() {
           tension: 50, // 스프링의 강도
           useNativeDriver: true,
         }),
-      ])
+      ]),
     ).start();
   }, [scaleAnim, fadeAnim]);
 
@@ -33,13 +35,16 @@ export default function RegisterComplete() {
       const timer = setTimeout(() => setCountdown(countdown - 1), 1000);
       return () => clearTimeout(timer);
     } else {
-      // 카운트다운이 0이 되었을 때 페이지 이동 코드 넣을 것
+      navigation.reset({
+        index: 0,
+        routes: [{name: 'ExpertMainScreen'}],
+      });
     }
   }, [countdown]);
 
   const animatedStyle = {
     opacity: fadeAnim,
-    transform: [{ scale: scaleAnim }],
+    transform: [{scale: scaleAnim}],
   };
 
   return (
@@ -48,7 +53,9 @@ export default function RegisterComplete() {
         <Octicons name="check-circle-fill" size={100} color="#FCCB02" />
       </Animated.View>
       <Text style={styles.mainText}>등록이 완료되었습니다</Text>
-      <Text style={styles.subText}>{countdown}초 후에 자동으로 페이지가 닫힙니다</Text>
+      <Text style={styles.subText}>
+        {countdown}초 후에 자동으로 페이지가 닫힙니다
+      </Text>
     </View>
   );
 }

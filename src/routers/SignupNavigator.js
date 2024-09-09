@@ -21,6 +21,7 @@ import RegisterHome from '../screens/Register/RegisterHome';
 import RegisterImg from '../screens/Register/RegisterImg';
 import RegisterNum from '../screens/Register/RegisterNum';
 import RegisterNote from '../screens/Register/RegisterNote';
+import RegisterComplete from '../screens/Register/RegisterComplete';
 
 const Stack = createStackNavigator();
 
@@ -126,6 +127,11 @@ export default function SignupNavigator() {
         <Stack.Screen
           name="SignupNoteElder"
           component={RegisterNote}
+          options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name="SignupCompleteElder"
+          component={RegisterComplete}
           options={{headerShown: false}}
         />
       </Stack.Navigator>

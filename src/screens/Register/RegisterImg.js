@@ -9,16 +9,35 @@ import {
 } from 'react-native';
 import {launchImageLibrary} from 'react-native-image-picker';
 import IoniconsIcons from 'react-native-vector-icons/Ionicons';
-import {useNavigation} from '@react-navigation/native';
+import {useNavigation, useRoute} from '@react-navigation/native';
 
 export default function RegisterImg() {
   const [imageUri, setImageUri] = useState(null);
   const [imageData, setImageData] = useState({});
   const navigation = useNavigation();
+  const route = useRoute();
+  const {
+    name,
+    gender,
+    birthDate,
+    homeAddress,
+    emergencyName,
+    emergencyContact,
+    relationship,
+  } = route.params;
 
   const handleNextPress = () => {
     if (imageUri !== null) {
-      navigation.navigate('SignupContactElder');
+      navigation.navigate('SignupContactElder', {
+        name: name,
+        gender: gender,
+        birthDate: birthDate,
+        homeAddress: homeAddress,
+        emergencyName: emergencyName,
+        emergencyContact: emergencyContact,
+        relationship: relationship,
+        imgFile: imageData,
+      });
     } else {
       Alert.alert(
         '오류',

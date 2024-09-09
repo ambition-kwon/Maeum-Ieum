@@ -8,7 +8,7 @@ import {
   View,
 } from 'react-native';
 import IoniconsIcons from 'react-native-vector-icons/Ionicons';
-import {useNavigation} from '@react-navigation/native';
+import {useNavigation, useRoute} from '@react-navigation/native';
 
 export default function RegisterNum() {
   const [contact, setContact] = useState('');
@@ -18,10 +18,31 @@ export default function RegisterNum() {
     return phoneNumberPattern.test(phoneNumber);
   };
   const navigation = useNavigation();
+  const route = useRoute();
+  const {
+    name,
+    gender,
+    birthDate,
+    homeAddress,
+    emergencyName,
+    emergencyContact,
+    relationship,
+    imgFile,
+  } = route.params;
 
   const handleNextPress = () => {
     if (isValidPhoneNumber(contact)) {
-      navigation.navigate('SignupNoteElder');
+      navigation.navigate('SignupNoteElder', {
+        name: name,
+        gender: gender,
+        birthDate: birthDate,
+        homeAddress: homeAddress,
+        emergencyName: emergencyName,
+        emergencyContact: emergencyContact,
+        relationship: relationship,
+        imgFile: imgFile,
+        contact: contact,
+      });
     } else {
       Alert.alert(
         '오류',
