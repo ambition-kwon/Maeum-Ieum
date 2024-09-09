@@ -12,7 +12,7 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import IoniconsIcons from 'react-native-vector-icons/Ionicons';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import {checkUsername} from '../../services/axiosInstance';
+import {caregiver} from '../../services/controller';
 
 export default function Signup() {
   const [username, setUsername] = useState('');
@@ -27,7 +27,7 @@ export default function Signup() {
   const handleCheckUsername = async () => {
     if (username !== '') {
       try {
-        const {data} = await checkUsername(username);
+        const {data} = await caregiver.checkUsername(username);
         if (data.duplicated === false) {
           setIsVerified(true);
           Alert.alert('확인완료', '사용 가능한 아이디입니다.');

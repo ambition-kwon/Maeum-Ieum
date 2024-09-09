@@ -9,7 +9,7 @@ import {
 } from 'react-native';
 import {useNavigation, useRoute} from '@react-navigation/native';
 import IoniconsIcons from 'react-native-vector-icons/Ionicons';
-import {createUser} from '../../services/axiosInstance';
+import {caregiver} from '../../services/controller';
 
 export default function SignupNum() {
   const isValidPhoneNumber = phoneNumber => {
@@ -42,7 +42,7 @@ export default function SignupNum() {
       formData.append('name', realname);
       formData.append('img', imageData);
       try {
-        const response = await createUser(formData);
+        const response = await caregiver.signup(formData);
         console.log(response.data);
         navigation.navigate('AdminApprove');
       } catch (error) {

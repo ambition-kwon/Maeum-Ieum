@@ -24,28 +24,4 @@ axiosInstance.interceptors.request.use(
   },
 );
 
-export const checkUsername = async username => {
-  try {
-    const response = await axiosInstance.get(
-      `/caregivers/check-username/${username}`,
-    );
-    return response.data;
-  } catch (error) {
-    console.log(error);
-  }
-};
-
-export const createUser = async data => {
-  try {
-    const response = await axiosInstance.post('/caregivers', data, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-        Accept: 'application/json',
-      },
-    });
-    return response.data;
-  } catch (error) {
-    console.log('응답 오류');
-    console.log(JSON.stringify(error.response.data, null, 2));
-  }
-};
+export default axiosInstance;
