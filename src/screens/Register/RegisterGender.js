@@ -1,16 +1,28 @@
-import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import React, {useState} from 'react';
+import {View, Text, TouchableOpacity, StyleSheet, Alert} from 'react-native';
 import IoniconsIcons from 'react-native-vector-icons/Ionicons';
+import {useNavigation, useRoute} from '@react-navigation/native';
 
 export default function RegisterGender() {
   const [selectedGender, setSelectedGender] = useState(null);
-
-  const handleGenderPress = (gender) => {
+  const navigation = useNavigation();
+  const handleGenderPress = gender => {
     setSelectedGender(gender);
   };
-
+  const route = useRoute();
+  const {name} = route.params;
   const handleNextPress = () => {
-    console.log('Next icon pressed');
+    if (selectedGender !== null) {
+      navigation.navigate('SignupDateElder', {
+        name: name,
+        gender: selectedGender.toUpperCase(),
+      });
+    } else {
+      Alert.alert(
+        '오류',
+        '성별이 선택되지 않았습니다.\n다시 한 번 확인해 주세요.',
+      );
+    }
   };
 
   return (
@@ -35,8 +47,7 @@ export default function RegisterGender() {
             styles.maleOption,
             selectedGender === 'male' && styles.selectedMale,
           ]}
-          onPress={() => handleGenderPress('male')}
-        >
+          onPress={() => handleGenderPress('male')}>
           <IoniconsIcons name="male" size={100} color="#58A6FF" />
         </TouchableOpacity>
         <TouchableOpacity
@@ -45,12 +56,14 @@ export default function RegisterGender() {
             styles.femaleOption,
             selectedGender === 'female' && styles.selectedFemale,
           ]}
-          onPress={() => handleGenderPress('female')}
-        >
+          onPress={() => handleGenderPress('female')}>
           <IoniconsIcons name="female" size={100} color="#D99BFF" />
         </TouchableOpacity>
       </View>
-      <TouchableOpacity style={styles.nextIconContainer} onPress={handleNextPress} activeOpacity={0.7}>
+      <TouchableOpacity
+        style={styles.nextIconContainer}
+        onPress={handleNextPress}
+        activeOpacity={0.7}>
         <IoniconsIcons name="arrow-forward-circle" size={50} color="#FCCB02" />
       </TouchableOpacity>
     </View>

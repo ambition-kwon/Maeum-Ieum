@@ -1,12 +1,54 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, StyleSheet, Image, TouchableOpacity } from 'react-native';
+import React, {useState} from 'react';
+import {
+  Alert,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import IoniconsIcons from 'react-native-vector-icons/Ionicons';
+import {useNavigation, useRoute} from '@react-navigation/native';
 
 export default function RegisterNum() {
-  const [searchText, setSearchText] = useState('');
+  const [contact, setContact] = useState('');
+  const isValidPhoneNumber = phoneNumber => {
+    const phoneNumberPattern =
+      /^(01[016789]-\d{3,4}-\d{4}|0[2-9]{1}\d{1}-\d{3,4}-\d{4})$/;
+    return phoneNumberPattern.test(phoneNumber);
+  };
+  const navigation = useNavigation();
+  const route = useRoute();
+  const {
+    name,
+    gender,
+    birthDate,
+    homeAddress,
+    emergencyName,
+    emergencyContact,
+    relationship,
+    imgFile,
+  } = route.params;
 
   const handleNextPress = () => {
-    console.log('Next icon pressed');
+    if (isValidPhoneNumber(contact)) {
+      navigation.navigate('SignupNoteElder', {
+        name: name,
+        gender: gender,
+        birthDate: birthDate,
+        homeAddress: homeAddress,
+        emergencyName: emergencyName,
+        emergencyContact: emergencyContact,
+        relationship: relationship,
+        imgFile: imgFile,
+        contact: contact,
+      });
+    } else {
+      Alert.alert(
+        '오류',
+        '유효한 전화번호 형식이 아닙니다.\n다시 한 번 확인해 주세요.',
+      );
+    }
   };
 
   return (
@@ -31,10 +73,15 @@ export default function RegisterNum() {
             placeholder="연락처를 입력해주세요"
             placeholderTextColor="#B0B0B0"
             keyboardType="numeric"
+            value={contact}
+            onChangeText={text => setContact(text.trim())}
           />
         </View>
       </View>
-      <TouchableOpacity style={styles.nextIconContainer} onPress={handleNextPress} activeOpacity={0.7}>
+      <TouchableOpacity
+        style={styles.nextIconContainer}
+        onPress={handleNextPress}
+        activeOpacity={0.7}>
         <IoniconsIcons name="arrow-forward-circle" size={50} color="#FCCB02" />
       </TouchableOpacity>
     </View>

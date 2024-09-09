@@ -1,6 +1,15 @@
-import React, { useState } from 'react';
-import { View, Text, Image, TouchableOpacity, TextInput, StyleSheet, FlatList, TouchableWithoutFeedback } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import React, {useEffect, useState} from 'react';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  TextInput,
+  StyleSheet,
+  FlatList,
+  TouchableWithoutFeedback,
+  Alert,
+} from 'react-native';
+import {useNavigation, useRoute} from '@react-navigation/native';
 import IoniconsIcons from 'react-native-vector-icons/Ionicons';
 import SimpleLineIcons from 'react-native-vector-icons/SimpleLineIcons';
 
@@ -10,7 +19,7 @@ const dummyData = [
   '사랑 요양원',
   '사랑나눔 요양원',
   '꿈누리 요양원',
-  '하늘꿈 요양원'
+  '하늘꿈 요양원',
 ];
 
 export default function SignupOrg() {
@@ -18,13 +27,29 @@ export default function SignupOrg() {
   const [filteredData, setFilteredData] = useState([]);
   const [showList, setShowList] = useState(false);
   const navigation = useNavigation();
+  const route = useRoute();
+  const {username, password, realname, selectedGender, formattedDate} =
+    route.params;
 
   const handleNextPress = () => {
-    console.log('Next icon pressed');
-    navigation.navigate('SignupImg');
+    if (searchText !== '' && showList === false) {
+      navigation.navigate('SignupImg', {
+        username: username,
+        password: password,
+        realname: realname,
+        selectedGender: selectedGender,
+        formattedDate: formattedDate,
+        organization: searchText,
+      });
+    } else {
+      Alert.alert(
+        '오류',
+        '소속기관을 선택하지 않았습니다.\n다시 한 번 확인해 주세요.',
+      );
+    }
   };
 
-  const handleSearch = (text) => {
+  const handleSearch = text => {
     setSearchText(text);
     if (text === '') {
       setShowList(false);
@@ -36,7 +61,7 @@ export default function SignupOrg() {
     }
   };
 
-  const handleItemPress = (item) => {
+  const handleItemPress = item => {
     setSearchText(item);
     setShowList(false);
   };
@@ -66,7 +91,9 @@ export default function SignupOrg() {
               onChangeText={handleSearch}
               onFocus={() => setShowList(true)}
             />
-            <TouchableOpacity style={styles.searchButton} onPress={() => handleSearch(searchText)}>
+            <TouchableOpacity
+              style={styles.searchButton}
+              onPress={() => handleSearch(searchText)}>
               <SimpleLineIcons name="magnifier" size={20} color="#58A6FF" />
             </TouchableOpacity>
           </View>
@@ -76,8 +103,10 @@ export default function SignupOrg() {
           <FlatList
             data={filteredData}
             keyExtractor={(item, index) => index.toString()}
-            renderItem={({ item }) => (
-              <TouchableOpacity onPress={() => handleItemPress(item)} style={styles.listItem}>
+            renderItem={({item}) => (
+              <TouchableOpacity
+                onPress={() => handleItemPress(item)}
+                style={styles.listItem}>
                 <Text style={styles.itemText}>{item}</Text>
               </TouchableOpacity>
             )}
@@ -85,8 +114,15 @@ export default function SignupOrg() {
           />
         )}
 
-        <TouchableOpacity style={styles.nextIconContainer} onPress={handleNextPress} activeOpacity={0.7}>
-          <IoniconsIcons name="arrow-forward-circle" size={50} color="#FCCB02" />
+        <TouchableOpacity
+          style={styles.nextIconContainer}
+          onPress={handleNextPress}
+          activeOpacity={0.7}>
+          <IoniconsIcons
+            name="arrow-forward-circle"
+            size={50}
+            color="#FCCB02"
+          />
         </TouchableOpacity>
       </View>
     </TouchableWithoutFeedback>

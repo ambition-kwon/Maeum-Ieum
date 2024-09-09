@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Alert } from "react-native";
 import DatePicker from 'react-native-date-picker';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute } from "@react-navigation/native";
 import IoniconsIcons from 'react-native-vector-icons/Ionicons';
 
 export default function SignupDate() {
@@ -9,17 +9,30 @@ export default function SignupDate() {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [formattedDate, setFormattedDate] = useState('');
   const navigation = useNavigation();
+  const route = useRoute();
+  const { username, password, realname, selectedGender } = route.params;
 
   const handleConfirm = (date) => {
     setDatePickerVisibility(false);
     setSelectedDate(date);
-    const formatted = `${date.getFullYear()}년 ${date.getMonth() + 1}월 ${date.getDate()}일`
+    // YYYY-MM-DD 형식 준수 (Backend 요청사항)
+    const formatted = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
     setFormattedDate(formatted);
   };
 
   const handleNextPress = () => {
-    console.log('Next icon pressed');
-    navigation.navigate('SignupOrg');
+    if(formattedDate !== ''){
+    navigation.navigate('SignupOrg',{
+      username: username,
+      password: password,
+      realname: realname,
+      selectedGender: selectedGender,
+      formattedDate: formattedDate
+    });
+    }
+    else{
+      Alert.alert('오류', '생년월일이 선택되지 않았습니다.\n다시 한 번 확인해 주세요.');
+    }
   };
 
   return (

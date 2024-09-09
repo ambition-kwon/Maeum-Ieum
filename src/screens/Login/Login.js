@@ -1,13 +1,40 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import React, {useEffect, useState} from 'react';
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+  Alert,
+} from 'react-native';
+import {useNavigation} from '@react-navigation/native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import {caregiver} from '../../services/controller';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function Login() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const navigation = useNavigation();
+  const handleSubmit = async () => {
+    try {
+      const response = await caregiver.login(username, password);
+      await AsyncStorage.setItem('token', response.headers.getAuthorization());
+      console.log(JSON.stringify(response.headers, null, 2));
+      navigation.navigate('ExpertMainScreen');
+    } catch (error) {
+      Alert.alert('오류', '로그인이 실패하였습니다.\n계정을 재 확인해 주세요.');
+    }
+  };
+
+  // 토큰 있을 경우 자동로그인
+  useEffect(() => {
+    const token = AsyncStorage.getItem('token');
+    if (token !== null) {
+      navigation.navigate('ExpertMainScreen');
+    }
+  }, []);
 
   return (
     <View style={styles.container}>
@@ -27,7 +54,11 @@ export default function Login() {
           />
         </View>
         <View style={styles.inputWrapper}>
-          <MaterialCommunityIcons name="lock-outline" size={28} color="#959595" />
+          <MaterialCommunityIcons
+            name="lock-outline"
+            size={28}
+            color="#959595"
+          />
           <TextInput
             style={styles.input}
             placeholder="비밀번호를 입력해주세요"
@@ -46,7 +77,7 @@ export default function Login() {
           <Text style={styles.linkText}>아이디 | 비밀번호 찾기</Text>
         </TouchableOpacity>
       </View>
-      <TouchableOpacity style={styles.loginButton}>
+      <TouchableOpacity style={styles.loginButton} onPress={handleSubmit}>
         <Text style={styles.loginButtonText}>로그인</Text>
       </TouchableOpacity>
       <TouchableOpacity onPress={() => navigation.navigate('Signup')}>

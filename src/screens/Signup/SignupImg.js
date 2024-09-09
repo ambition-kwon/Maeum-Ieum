@@ -1,17 +1,47 @@
-import React, { useState } from 'react';
-import { View, Text, Image, TouchableOpacity, StyleSheet, Alert } from 'react-native';
-import { launchImageLibrary } from 'react-native-image-picker';
-import { useNavigation } from '@react-navigation/native';
+import React, {useState} from 'react';
+import {
+  View,
+  Text,
+  Image,
+  TouchableOpacity,
+  StyleSheet,
+  Alert,
+} from 'react-native';
+import {launchImageLibrary} from 'react-native-image-picker';
+import {useNavigation, useRoute} from '@react-navigation/native';
 import IoniconsIcons from 'react-native-vector-icons/Ionicons';
 
 export default function SignupImg() {
-  const [searchText, setSearchText] = useState('');
   const [imageUri, setImageUri] = useState(null);
+  const [imageData, setImageData] = useState({});
   const navigation = useNavigation();
+  const route = useRoute();
+  const {
+    username,
+    password,
+    realname,
+    selectedGender,
+    formattedDate,
+    organization,
+  } = route.params;
 
   const handleNextPress = () => {
-    console.log('Next icon pressed');
-    navigation.navigate('SignupNum');
+    if (imageUri !== null) {
+      navigation.navigate('SignupNum', {
+        username: username,
+        password: password,
+        realname: realname,
+        selectedGender: selectedGender,
+        formattedDate: formattedDate,
+        organization: organization,
+        imageData: imageData,
+      });
+    } else {
+      Alert.alert(
+        '오류',
+        '프로필 사진을 선택하지 않았습니다.\n다시 한 번 확인해 주세요.',
+      );
+    }
   };
 
   const handleImagePress = () => {
@@ -22,15 +52,19 @@ export default function SignupImg() {
       maxHeight: 300,
     };
 
-    launchImageLibrary(options, (response) => {
+    launchImageLibrary(options, response => {
       if (response.didCancel) {
         console.log('User cancelled image picker');
       } else if (response.errorMessage) {
         console.log('ImagePicker Error: ', response.errorMessage);
       } else {
-        const source = { uri: response.assets[0].uri };
+        const source = {uri: response.assets[0].uri};
         setImageUri(source.uri);
-        console.log('Image selected: ', source.uri);
+        setImageData({
+          uri: response.assets[0].uri,
+          type: response.assets[0].type,
+          name: `image_${Date.now()}`,
+        });
       }
     });
   };
@@ -50,9 +84,12 @@ export default function SignupImg() {
         <Text style={styles.welcomeText}>사진을 등록해주세요</Text>
       </View>
 
-      <TouchableOpacity style={styles.imageContainer} onPress={handleImagePress} activeOpacity={0.7}>
+      <TouchableOpacity
+        style={styles.imageContainer}
+        onPress={handleImagePress}
+        activeOpacity={0.7}>
         {imageUri ? (
-          <Image source={{ uri: imageUri }} style={styles.imagePlaceholder} />
+          <Image source={{uri: imageUri}} style={styles.imagePlaceholder} />
         ) : (
           <View style={styles.imagePlaceholder}>
             <Text style={styles.plusSign}>+</Text>
@@ -60,7 +97,10 @@ export default function SignupImg() {
         )}
       </TouchableOpacity>
 
-      <TouchableOpacity style={styles.nextIconContainer} onPress={handleNextPress} activeOpacity={0.7}>
+      <TouchableOpacity
+        style={styles.nextIconContainer}
+        onPress={handleNextPress}
+        activeOpacity={0.7}>
         <IoniconsIcons name="arrow-forward-circle" size={50} color="#FCCB02" />
       </TouchableOpacity>
     </View>

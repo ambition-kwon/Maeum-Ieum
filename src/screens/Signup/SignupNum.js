@@ -1,15 +1,59 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, StyleSheet, Image, TouchableOpacity } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import React, {useState} from 'react';
+import {
+  View,
+  Text,
+  TextInput,
+  StyleSheet,
+  TouchableOpacity,
+  Alert,
+} from 'react-native';
+import {useNavigation, useRoute} from '@react-navigation/native';
 import IoniconsIcons from 'react-native-vector-icons/Ionicons';
+import {caregiver} from '../../services/controller';
 
 export default function SignupNum() {
-  const [searchText, setSearchText] = useState('');
+  const isValidPhoneNumber = phoneNumber => {
+    const phoneNumberPattern =
+      /^(01[016789]-\d{3,4}-\d{4}|0[2-9]{1}\d{1}-\d{3,4}-\d{4})$/;
+    return phoneNumberPattern.test(phoneNumber);
+  };
   const navigation = useNavigation();
+  const route = useRoute();
+  const {
+    username,
+    password,
+    realname,
+    selectedGender,
+    formattedDate,
+    organization,
+    imageData,
+  } = route.params;
+  const [contact, setContact] = useState('');
 
-  const handleNextPress = () => {
-    console.log('Next icon pressed');
-    navigation.navigate('AdminApprove');
+  const handleNextPress = async () => {
+    const formData = new FormData();
+    if (isValidPhoneNumber(contact)) {
+      formData.append('username', username);
+      formData.append('password', password);
+      formData.append('contact', contact);
+      formData.append('gender', selectedGender.toUpperCase());
+      formData.append('birthDate', formattedDate);
+      formData.append('organization', organization);
+      formData.append('name', realname);
+      formData.append('img', imageData);
+      try {
+        const response = await caregiver.signup(formData);
+        console.log(response.data);
+        navigation.navigate('AdminApprove');
+      } catch (error) {
+        console.log(error);
+      }
+    } else {
+      Alert.alert(
+        '오류',
+        '유효한 전화번호 형식이 아닙니다.\n다시 한 번 확인해 주세요.',
+      );
+    }
   };
 
   return (
@@ -33,10 +77,15 @@ export default function SignupNum() {
             placeholder="연락처를 입력해주세요"
             placeholderTextColor="#B0B0B0"
             keyboardType="numeric"
+            value={contact}
+            onChangeText={text => setContact(text.trim)}
           />
         </View>
       </View>
-      <TouchableOpacity style={styles.nextIconContainer} onPress={handleNextPress} activeOpacity={0.7}>
+      <TouchableOpacity
+        style={styles.nextIconContainer}
+        onPress={handleNextPress}
+        activeOpacity={0.7}>
         <IoniconsIcons name="arrow-forward-circle" size={50} color="#FCCB02" />
       </TouchableOpacity>
     </View>

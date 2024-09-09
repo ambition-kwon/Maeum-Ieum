@@ -1,50 +1,60 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, Image, StyleSheet, TouchableOpacity, ScrollView, Clipboard } from 'react-native';
+import React, {useState, useEffect} from 'react';
+import {
+  View,
+  Text,
+  Image,
+  StyleSheet,
+  TouchableOpacity,
+  ScrollView,
+  Clipboard,
+} from 'react-native';
 import FontistoIcon from 'react-native-vector-icons/Fontisto';
 import OcticonsIcon from 'react-native-vector-icons/Octicons';
 import FeatherIcon from 'react-native-vector-icons/Feather';
+import {caregiver} from '../../services/controller';
+import {useNavigation} from '@react-navigation/native';
 
 // 테스트 임시 데이터
 const tempData = [
   {
-    uid: 'user332429791',
+    elderlyId: 'user332429791',
     name: '권혁원 어르신',
     age: 78,
     address: '경기도 고양시 일산동구',
-    phone: '010-6846-3548',
+    contact: '010-6846-3548',
   },
   {
-    uid: 'user332429792',
+    elderlyId: 'user332429792',
     name: '김영희 어르신',
     age: 82,
     address: '서울특별시 종로구',
-    phone: '010-1234-5678',
+    contact: '010-1234-5678',
   },
   {
-    uid: 'user332429793',
+    elderlyId: 'user332429793',
     name: '박철수 어르신',
     age: 75,
     address: '부산광역시 해운대구',
-    phone: '010-9876-5432',
+    contact: '010-9876-5432',
   },
   {
-    uid: 'user332429794',
+    elderlyId: 'user332429794',
     name: '이민수 어르신',
     age: 80,
     address: '대전광역시 서구',
-    phone: '010-1111-2222',
+    contact: '010-1111-2222',
   },
   {
-    uid: 'user332429795',
+    elderlyId: 'user332429795',
     name: '최은희 어르신',
     age: 85,
     address: '인천광역시 남동구',
-    phone: '010-3333-4444',
-  }
+    contact: '010-3333-4444',
+  },
 ];
 
 // 전문가의 정보가 표시되는 header 영역
-const Header = () => {
+const Header = ({img, name, organization, totalCareNumber}) => {
   return (
     <View style={styles.header}>
       <View style={styles.iconContainer}>
@@ -56,14 +66,13 @@ const Header = () => {
         </TouchableOpacity>
       </View>
       <View style={styles.profileContainer}>
-        <Image
-          source={{ uri: 'https://via.placeholder.com/150' }}
-          style={styles.profileImage}
-        />
+        <Image source={{uri: img}} style={styles.profileImage} />
         <View style={styles.infoContainer}>
-          <Text style={styles.nameText}>정진아 요양사님</Text>
-          <Text style={styles.centerText}>큰 푸른 숲 요양원</Text>
-          <Text style={styles.totalText}>총 관리 인원 : 00명</Text>
+          <Text style={styles.nameText}>{name} 요양사님</Text>
+          <Text style={styles.centerText}>{organization}</Text>
+          <Text style={styles.totalText}>
+            총 관리 인원 : {totalCareNumber}명
+          </Text>
         </View>
       </View>
     </View>
@@ -71,31 +80,37 @@ const Header = () => {
 };
 
 // 어르신 정보 카드
-const SeniorCard = ({ uid, name, age, address, phone, onCopy }) => {
+const SeniorCard = ({elderlyId, name, age, address, contact, onCopy}) => {
   const copyToClipboard = () => {
-    Clipboard.setString(uid);
+    Clipboard.setString(elderlyId);
     onCopy();
   };
 
   return (
     <View style={styles.card}>
       <View style={styles.cardIdContainer}>
-        <Text style={styles.cardId}>uid : {uid}</Text>
+        <Text style={styles.cardId}>uid : {elderlyId}</Text>
         <TouchableOpacity style={styles.copyButton} onPress={copyToClipboard}>
           <FeatherIcon name="copy" size={16} color="black" />
         </TouchableOpacity>
       </View>
       <View style={styles.cardContent}>
         <Image
-          source={{ uri: 'https://via.placeholder.com/150' }}
+          source={{uri: 'https://via.placeholder.com/150'}}
           style={styles.cardImage}
         />
         <View style={styles.cardTextContainer}>
-          <Text style={styles.cardName}>{name}({age})</Text>
+          <Text style={styles.cardName}>
+            {name}({age})
+          </Text>
           <Text style={styles.cardAddress}>{address}</Text>
-          <Text style={styles.cardPhone}>{phone}</Text>
+          <Text style={styles.cardPhone}>{contact}</Text>
         </View>
-        <TouchableOpacity style={styles.cardBadgeContainer} onPress={() => { /* 아무 동작도 하지 않음 */ }}>
+        <TouchableOpacity
+          style={styles.cardBadgeContainer}
+          onPress={() => {
+            /* 아무 동작도 하지 않음 */
+          }}>
           <Text style={styles.cardBadge}>AI 확인</Text>
         </TouchableOpacity>
       </View>
@@ -106,9 +121,26 @@ const SeniorCard = ({ uid, name, age, address, phone, onCopy }) => {
 const ExpertMainScreen = () => {
   const [showCopiedMessage, setShowCopiedMessage] = useState(false);
   const [seniorData, setSeniorData] = useState([]);
-
+  const [img, setImg] = useState('https://via.placeholder.com/150');
+  const [name, setName] = useState('');
+  const [organization, setOrganization] = useState('');
+  const [totalCareNumber, setTotalCareNumber] = useState(0);
+  const navigation = useNavigation();
   useEffect(() => {
     setSeniorData(tempData); // 임시 데이터 설정
+    caregiver
+      .info()
+      .then(response => {
+        setImg(response.data.data.img);
+        setName(response.data.data.name);
+        setOrganization(response.data.data.organization);
+        setTotalCareNumber(response.data.data.totalCareNumber);
+      })
+      .catch(error => {
+        console.log(error.response.data);
+        //강제 로그아웃
+        navigation.navigate('Login');
+      });
   }, []);
 
   const handleCopy = () => {
@@ -116,18 +148,27 @@ const ExpertMainScreen = () => {
     setTimeout(() => setShowCopiedMessage(false), 2000);
   };
 
+  const handleNavigate = () => {
+    navigation.navigate('SignupNameElder');
+  };
+
   return (
     <View style={styles.container}>
-      <Header />
+      <Header
+        img={img}
+        name={name}
+        organization={organization}
+        totalCareNumber={totalCareNumber}
+      />
       <ScrollView contentContainerStyle={styles.scrollContainer}>
-        {seniorData.map((senior) => (
+        {seniorData.map((senior, index) => (
           <SeniorCard
-            key={senior.uid}
-            uid={senior.uid}
+            key={index}
+            uid={senior.elderlyId}
             name={senior.name}
             age={senior.age}
             address={senior.address}
-            phone={senior.phone}
+            contact={senior.contact}
             onCopy={handleCopy}
           />
         ))}
@@ -137,7 +178,7 @@ const ExpertMainScreen = () => {
           <Text style={styles.copiedMessageText}>복사되었습니다.</Text>
         </View>
       )}
-      <TouchableOpacity style={styles.floatingButton}>
+      <TouchableOpacity style={styles.floatingButton} onPress={handleNavigate}>
         <Text style={styles.floatingButtonText}>+</Text>
       </TouchableOpacity>
     </View>
@@ -210,7 +251,7 @@ const styles = StyleSheet.create({
     marginVertical: 10,
     width: '90%',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
+    shadowOffset: {width: 0, height: 4},
     shadowOpacity: 0.1,
     shadowRadius: 5,
     elevation: 5,
@@ -297,7 +338,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
+    shadowOffset: {width: 0, height: 4},
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
     elevation: 5,

@@ -1,10 +1,56 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, StyleSheet, Image, TouchableOpacity } from 'react-native';
+import React, {useState} from 'react';
+import {
+  Alert,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import IoniconsIcons from 'react-native-vector-icons/Ionicons';
+import {useNavigation, useRoute} from '@react-navigation/native';
+import {elderly} from '../../services/controller';
 
 export default function RegisterNote() {
-  const handleNextPress = () => {
-    console.log('Next icon pressed');
+  const [healthInfo, setHealthInfo] = useState('');
+  const navigation = useNavigation();
+  const route = useRoute();
+  const {
+    name,
+    gender,
+    birthDate,
+    homeAddress,
+    emergencyName,
+    emergencyContact,
+    relationship,
+    imgFile,
+    contact,
+  } = route.params;
+  const handleNextPress = async () => {
+    if (healthInfo !== '' && healthInfo.length > 0) {
+      const formData = new FormData();
+      formData.append('name', name);
+      formData.append('gender', gender);
+      formData.append('birthDate', birthDate);
+      formData.append('homeAddress', homeAddress);
+      formData.append('emergencyName', emergencyName);
+      formData.append('emergencyContact', emergencyContact);
+      formData.append('relationship', relationship);
+      formData.append('contact', contact);
+      formData.append('imgFile', imgFile);
+      formData.append('healthInfo', healthInfo);
+      try {
+        await elderly.signup(formData);
+        navigation.navigate('SignupCompleteElder');
+      } catch (error) {
+        console.log(JSON.stringify(error.response.data, null, 2));
+      }
+    } else {
+      Alert.alert(
+        '오류',
+        '어르신에 대한 특이사항이 입력되지 않았습니다.\n다시 한 번 확인해 주세요.',
+      );
+    }
   };
 
   return (
@@ -28,10 +74,15 @@ export default function RegisterNote() {
             style={styles.input}
             placeholder="질병 또는 기타 메모 사항을 입력해주세요"
             placeholderTextColor="#B0B0B0"
+            value={healthInfo}
+            onChangeText={setHealthInfo}
           />
         </View>
       </View>
-      <TouchableOpacity style={styles.nextIconContainer} onPress={handleNextPress} activeOpacity={0.7}>
+      <TouchableOpacity
+        style={styles.nextIconContainer}
+        onPress={handleNextPress}
+        activeOpacity={0.7}>
         <IoniconsIcons name="arrow-forward-circle" size={50} color="#FCCB02" />
       </TouchableOpacity>
     </View>
