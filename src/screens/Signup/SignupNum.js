@@ -78,7 +78,7 @@ export default function SignupNum() {
             placeholderTextColor="#B0B0B0"
             keyboardType="numeric"
             value={contact}
-            onChangeText={text => setContact(text.trim)}
+            onChangeText={text => setContact(text.trim())}
           />
         </View>
       </View>

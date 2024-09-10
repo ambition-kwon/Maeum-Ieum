@@ -11,14 +11,14 @@ export default function AdminApprove() {
 
   useEffect(() => {
     // 페이드 인 애니메이션
-    Animated.timing(fadeAnim, {
+    const fadeInAnimation = Animated.timing(fadeAnim, {
       toValue: 1,
       duration: 1000,
       useNativeDriver: true,
-    }).start();
+    });
 
     // 진동 애니메이션
-    Animated.loop(
+    const scaleAnimation = Animated.loop(
       Animated.sequence([
         Animated.spring(scaleAnim, {
           toValue: 1.25, // 약간 확대
@@ -27,13 +27,20 @@ export default function AdminApprove() {
           useNativeDriver: true,
         }),
       ])
-    ).start();
+    );
+
+    // 애니메이션 시작
+    fadeInAnimation.start();
+    scaleAnimation.start();
 
     // 카운트다운 타이머 설정
     const timer = setInterval(() => {
       setCountdown(prevCountdown => {
         if (prevCountdown === 1) {
-          clearInterval(timer);
+          clearInterval(timer); // 타이머 해제
+          // 네비게이션은 애니메이션 종료 후 진행
+          fadeInAnimation.stop();
+          scaleAnimation.stop();
           navigation.navigate('Login');
         }
         return prevCountdown - 1;
@@ -49,8 +56,11 @@ export default function AdminApprove() {
     const backHandler = BackHandler.addEventListener('hardwareBackPress', backAction);
 
     return () => {
+      // 컴포넌트 언마운트 시 타이머와 애니메이션 해제
       backHandler.remove();
-      clearInterval(timer); // 타이머 클리어
+      clearInterval(timer); // 타이머 해제
+      fadeInAnimation.stop();
+      scaleAnimation.stop();
     };
   }, [scaleAnim, fadeAnim, navigation]);
 
