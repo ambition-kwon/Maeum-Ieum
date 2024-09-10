@@ -14,7 +14,7 @@ export default function RegisterName() {
   const navigation = useNavigation();
   const [name, setName] = useState('');
   const handleNavigate = () => {
-    if (name.length > 0 && name !== '') {
+    if (name.length >= 2 && name !== '') {
       navigation.navigate('SignupGenderElder', {
         name: name,
       });

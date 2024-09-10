@@ -23,7 +23,7 @@ export default function RegisterENum() {
   const [emergencyContact, setEmergencyContact] = useState('');
   const [relationship, setRelationship] = useState('');
   const handleNextPress = () => {
-    if (emergencyName === '' || emergencyName.length === 0) {
+    if (emergencyName === '' || emergencyName.length < 2) {
       Alert.alert(
         '오류',
         '유효한 이름 형식이 아닙니다.\n다시 한 번 확인해 주세요.',

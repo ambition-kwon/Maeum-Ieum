@@ -16,7 +16,7 @@ export default function SignupName() {
   const route = useRoute();
   const {username, password} = route.params;
   const handleNextPress = () => {
-    if (realname !== '' && realname.length > 0) {
+    if (realname !== '' && realname.length >= 2) {
       navigation.navigate('SignupGender', {
         username: username,
         password: password,
