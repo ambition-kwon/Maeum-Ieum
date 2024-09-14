@@ -1,18 +1,24 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image, Animated, Easing, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Image, Animated, Easing, ScrollView, TextInput } from 'react-native'; // TextInput 추가
 import SimpleLineIcons from 'react-native-vector-icons/SimpleLineIcons';
 import IoniconsIcon from 'react-native-vector-icons/Ionicons';
+import FeatherIcon from 'react-native-vector-icons/Feather';
 
 const dummyData = [
-  '오늘은 담당 요양사가 방문하는 날입니다! 오늘은 담당 요양사가 방문하는 날입니다! 오늘은 담당 요양사가 방문하는 날입니다!',
+  '오늘은 담당 요양사가 방문하는 날입니다! 오늘은 담당 요양사가 방문하는 날입니다! 오늘은 담당 요양사가 방문하는 날입니다! 오늘은 담당 요양사가 방문하는 날입니다!',
 ];
 
 export default function Chat() {
   const [isRecording, setIsRecording] = useState(false);
+  const [selectedGender, setSelectedGender] = useState('male'); // 기본 값은 male로 설정해뒀음
   const spinValue = useRef(new Animated.Value(0)).current;
 
   const handleMicPress = () => {
     setIsRecording(prevState => !prevState);
+  };
+
+  const handleSend = () => {
+    console.log('보내기');
   };
 
   useEffect(() => {
@@ -35,10 +41,35 @@ export default function Chat() {
   return (
     <View style={styles.container}>
       <View style={styles.topHalf}>
-        <TouchableOpacity style={styles.previousConversationButton}>
+        <View style={styles.genderIcons}>
+          {/* 남성 아이콘 */}
+          <TouchableOpacity onPress={() => setSelectedGender('male')}>
+            <IoniconsIcon
+              name="male-outline"
+              size={30}
+              color={selectedGender === 'male' ? '#58A6FF' : 'black'}
+            />
+          </TouchableOpacity>
+
+          {/* 여성 아이콘 */}
+          <TouchableOpacity onPress={() => setSelectedGender('female')}>
+            <IoniconsIcon
+              name="female-outline"
+              size={30}
+              color={selectedGender === 'female' ? '#D99BFF' : 'black'}
+            />
+          </TouchableOpacity>
+        </View>
+
+        <TouchableOpacity style={styles.previousConversationButton} onPress={() => { console.log('이전'); }}>
           <Text style={styles.previousConversationText}>이전 대화 확인하기</Text>
         </TouchableOpacity>
-        <ScrollView style={styles.scrollTop} contentContainerStyle={styles.topHalfContent}>
+
+        <ScrollView
+          style={styles.scrollTop}
+          contentContainerStyle={styles.topHalfContent}
+          showsVerticalScrollIndicator={false}
+        >
           <Text style={styles.topText}>{dummyData[0]}</Text>
         </ScrollView>
 
@@ -53,7 +84,11 @@ export default function Chat() {
       </View>
 
       <View style={styles.bottomHalf}>
-        <ScrollView style={styles.scrollBottom} contentContainerStyle={styles.bottomHalfContent}>
+        <ScrollView
+          style={styles.scrollBottom}
+          contentContainerStyle={styles.bottomHalfContent}
+          showsVerticalScrollIndicator={false}
+        >
           <Text style={styles.bottomText}>{dummyData[0]}</Text>
         </ScrollView>
       </View>
@@ -72,18 +107,19 @@ export default function Chat() {
         </View>
       </View>
 
-      <TouchableOpacity style={styles.endButton}>
-        <Text style={styles.endButtonText}>대화 끝내기</Text>
-      </TouchableOpacity>
+      <View style={styles.inputContainer}>
+        <TextInput
+          style={styles.textInput}
+          placeholder="이음이는 어르신을 기다리고 있어요!"
+        />
+        <TouchableOpacity style={styles.sendButton} onPress={handleSend}>
+          <FeatherIcon name="send" size={25} color="#3369FF" />
+        </TouchableOpacity>
+      </View>
 
-      <Image
-        source={require('../../assets/icons/aiicon.png')}
-        style={styles.profileImageTopLeft}
-      />
-      <Image
-        source={require('../../assets/icons/aiicon.png')}
-        style={styles.profileImageBottomRight}
-      />
+      <TouchableOpacity style={styles.closeButton} onPress={() => { console.log('닫기'); }}>
+        <FeatherIcon name="x" size={35} color="black" />
+      </TouchableOpacity>
     </View>
   );
 }
@@ -91,6 +127,11 @@ export default function Chat() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  closeButton: {
+    position: 'absolute',
+    top: 20,
+    left: 10,
   },
   topHalf: {
     position: 'absolute',
@@ -112,37 +153,32 @@ const styles = StyleSheet.create({
   },
   scrollBottom: {
     marginTop: 75,
-    marginBottom: 95,
+    marginBottom: 80,
   },
   scrollTop: {
-    marginTop: 90,
+    marginTop: 70,
     marginBottom: 80,
   },
   topHalfContent: {
     alignItems: 'center',
     justifyContent: 'center',
-    paddingLeft: 20,
-    paddingRight: 20,
+    paddingLeft: 15,
+    paddingRight: 15,
   },
   bottomHalfContent: {
     alignItems: 'center',
     justifyContent: 'center',
-    paddingLeft: 20,
-    paddingRight: 20,
+    paddingLeft: 15,
+    paddingRight: 15,
   },
   previousConversationButton: {
     position: 'absolute',
-    top: 20,
-    right: 10,
-    backgroundColor: '#FFFFFF',
-    paddingHorizontal: 15,
-    paddingVertical: 10,
-    borderRadius: 20,
-    elevation: 3,
+    top: 25,
+    right: 15,
   },
   previousConversationText: {
-    fontSize: 16,
-    color: 'black',
+    fontSize: 14,
+    color: '#2400FF',
     fontWeight: 'bold',
   },
   spinnerContainer: {
@@ -198,36 +234,35 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     elevation: 5,
   },
-  endButton: {
+  genderIcons: {
+    flexDirection: 'row',
+    position: 'absolute',
+    top: 10,
+    left: '40%',
+    right: '40%',
+    justifyContent: 'space-between',
+    marginTop: 10,
+  },
+  inputContainer: {
+    flexDirection: 'row',
     position: 'absolute',
     bottom: 20,
-    left: '30%',
-    right: '30%',
-    backgroundColor: '#FCCB02',
-    borderRadius: 30,
-    paddingVertical: 10,
+    left: 20,
+    right: 20,
+    backgroundColor: '#fff',
+    borderRadius: 25,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
     alignItems: 'center',
-    justifyContent: 'center',
+    elevation: 5,
   },
-  endButtonText: {
-    color: 'black',
-    fontSize: 21,
-    fontWeight: 'bold',
+  textInput: {
+    flex: 1,
+    fontSize: 14,
+    paddingVertical: 5,
+    paddingHorizontal: 15,
   },
-  profileImageBottomRight: {
-    position: 'absolute',
-    bottom: 20,
-    right: 10,
-    width: 65,
-    height: 65,
-    borderRadius: 100,
-  },
-  profileImageTopLeft: {
-    position: 'absolute',
-    top: 20,
-    left: 10,
-    width: 65,
-    height: 65,
-    borderRadius: 100,
+  sendButton: {
+    marginRight: 5,
   },
 });
