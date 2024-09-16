@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, FlatList, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 
 const messages = [
   { id: 1, text: "오늘 할 일을 알려줄래?", time: "08.18 / 17:00", isSent: true },
@@ -15,9 +15,12 @@ const messages = [
 ];
 
 export default function ChatRecord() {
-  const renderItem = ({ item }) => (
-    <View style={[styles.messageContainer, item.isSent ? styles.sent : styles.received]}>
+  const renderItem = (item) => (
+    // 각 메시지를 전송 여부에 따라 다른 style을 적용
+    // isSent가 true이면 흰색 말풍선, false이면 노란 말풍선
+    <View key={item.id} style={[styles.messageContainer, item.isSent ? styles.sent : styles.received]}>
       <Text style={styles.messageText}>{item.text}</Text>
+      {/* 메시지 시간, isSent가 true (사용자가 전송한 메시지)일 경우 sentTime 스타일 적용 */}
       <Text style={[styles.messageTime, item.isSent && styles.sentTime]}>{item.time}</Text>
     </View>
   );
@@ -29,11 +32,13 @@ export default function ChatRecord() {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>대화 기록</Text>
-      <FlatList
-        data={messages}
-        renderItem={renderItem}
-        keyExtractor={item => item.id.toString()}
-      />
+
+      <ScrollView showsVerticalScrollIndicator={false}>
+        {/* 메시지 배열 렌더링 */}
+        {messages.map((item) => renderItem(item))}
+      </ScrollView>
+
+      {/* 뒤로가기 버튼 */}
       <TouchableOpacity onPress={handleBackPress}>
         <Text style={styles.backButton}>이전 화면으로</Text>
       </TouchableOpacity>
@@ -96,5 +101,6 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#ffd700',
     marginBottom: 10,
+    marginTop: 10,
   },
 });
