@@ -37,9 +37,8 @@ export default function RegisterNote() {
       formData.append('emergencyContact', emergencyContact);
       formData.append('relationship', relationship);
       formData.append('contact', contact);
-      formData.append('imgFile', imgFile);
+      formData.append('img', imgFile);
       formData.append('healthInfo', healthInfo);
-      console.log(JSON.stringify(formData, null, 2));
       try {
         await elderly.signup(formData);
         navigation.navigate('SignupCompleteElder');

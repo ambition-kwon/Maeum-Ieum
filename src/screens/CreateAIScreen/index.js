@@ -1,5 +1,15 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
+import React, {useState} from 'react';
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+  ScrollView,
+  Alert,
+} from 'react-native';
+import {useNavigation, useRoute} from '@react-navigation/native';
+import {caregiver} from '../../services/controller';
 
 const CreateAIScreen = () => {
   // 변수 선언
@@ -9,20 +19,43 @@ const CreateAIScreen = () => {
   const [forbiddenWords, setForbiddenWords] = useState('');
   const [responseType, setResponseType] = useState('');
   const [personality, setPersonality] = useState('');
-
-  // 생성하기 버튼을 눌렀을 때 실행되는 함수(임시)
-  const handleCreate = () => {
-    // 생성하기 로직 구현
+  const route = useRoute();
+  const {elderlyId} = route.params;
+  const navigation = useNavigation();
+  // 생성하기 버튼을 눌렀을 때 실행되는 함수
+  const handleCreate = async () => {
+    try {
+      await caregiver.createAI(elderlyId, {
+        name: aiName,
+        mandatoryRule: requiredRule,
+        conversationTopic: topic,
+        responseType: responseType,
+        personality: personality,
+        forbiddenTopic: forbiddenWords,
+      });
+      Alert.alert('알림', 'AI가 정상적으로 생성되었습니다.');
+      navigation.reset({
+        index: 0,
+        routes: [{name: 'ExpertMainScreen'}],
+      });
+    } catch (error) {
+      console.log(error.response.data);
+    }
   };
 
-  // 규칙 자동 완성 버튼을 눌렀을 때 실행되는 함수(임시)
-  const handleAutocomplete = () => {
-
+  // 규칙 자동 완성 버튼을 눌렀을 때 실행되는 함수
+  const handleAutocomplete = async () => {
+    try {
+      const response = await caregiver.ruleGenerate(elderlyId, requiredRule);
+      console.log(JSON.stringify(response.data.data.mandatoryRule));
+      setRequiredRule(response.data.data.mandatoryRule);
+    } catch (error) {
+      console.log(error.response.data);
+    }
   };
 
-  // 뒤로 가기 함수(임시)
   const handleBackPress = () => {
-    // 뒤로 가기 로직 구현
+    navigation.goBack();
   };
 
   return (
@@ -30,7 +63,7 @@ const CreateAIScreen = () => {
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         <View style={styles.headerContainer}>
           <TouchableOpacity style={styles.backButton} onPress={handleBackPress}>
-            <Text style={styles.backButtonText}>{"<"}</Text>
+            <Text style={styles.backButtonText}>{'<'}</Text>
           </TouchableOpacity>
           <Text style={styles.headerText}>AI Assistant 생성</Text>
         </View>
@@ -46,16 +79,21 @@ const CreateAIScreen = () => {
 
         <Text style={styles.label}>AI 규칙 설정(필수)</Text>
         <Text style={styles.subLabel}>
-          어르신이 사용하실 AI를 요양사님께서 여러 사항을 직접 설정하실 수 있습니다.
+          어르신이 사용하실 AI를 요양사님께서 여러 사항을 직접 설정하실 수
+          있습니다.
         </Text>
         <TextInput
-          style={styles.input}
+          style={styles.essentialInput}
           placeholder="내용을 입력해주세요"
           placeholderTextColor="#c4c4c4"
           value={requiredRule}
           onChangeText={setRequiredRule}
+          multiline={true}
+          numberOfLines={4}
         />
-        <TouchableOpacity style={styles.autocompleteButton} onPress={handleAutocomplete}>
+        <TouchableOpacity
+          style={styles.autocompleteButton}
+          onPress={handleAutocomplete}>
           <Text style={styles.buttonText}>규칙 자동 완성</Text>
         </TouchableOpacity>
 
@@ -152,9 +190,17 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   input: {
-    height: 50,
     borderBottomWidth: 1,
     borderBottomColor: '#000',
+    paddingLeft: 10,
+    paddingRight: 15,
+    fontSize: 16,
+    marginBottom: 15,
+    color: '#000',
+  },
+  essentialInput: {
+    borderWidth: 1,
+    borderColor: '#000',
     paddingLeft: 10,
     paddingRight: 15,
     fontSize: 16,

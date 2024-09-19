@@ -14,54 +14,18 @@ import FeatherIcon from 'react-native-vector-icons/Feather';
 import {caregiver} from '../../services/controller';
 import {useNavigation} from '@react-navigation/native';
 
-// 테스트 임시 데이터
-const tempData = [
-  {
-    elderlyId: 'user332429791',
-    name: '권혁원 어르신',
-    age: 78,
-    address: '경기도 고양시 일산동구',
-    contact: '010-6846-3548',
-  },
-  {
-    elderlyId: 'user332429792',
-    name: '김영희 어르신',
-    age: 82,
-    address: '서울특별시 종로구',
-    contact: '010-1234-5678',
-  },
-  {
-    elderlyId: 'user332429793',
-    name: '박철수 어르신',
-    age: 75,
-    address: '부산광역시 해운대구',
-    contact: '010-9876-5432',
-  },
-  {
-    elderlyId: 'user332429794',
-    name: '이민수 어르신',
-    age: 80,
-    address: '대전광역시 서구',
-    contact: '010-1111-2222',
-  },
-  {
-    elderlyId: 'user332429795',
-    name: '최은희 어르신',
-    age: 85,
-    address: '인천광역시 남동구',
-    contact: '010-3333-4444',
-  },
-];
-
 // 전문가의 정보가 표시되는 header 영역
 const Header = ({img, name, organization, totalCareNumber}) => {
+  const navigation = useNavigation();
   return (
     <View style={styles.header}>
       <View style={styles.iconContainer}>
         <TouchableOpacity style={styles.circleButton}>
           <FontistoIcon name="bell" size={30} color="black" />
         </TouchableOpacity>
-        <TouchableOpacity style={styles.circleButton}>
+        <TouchableOpacity
+          style={styles.circleButton}
+          onPress={() => navigation.navigate('MyPageScreen')}>
           <OcticonsIcon name="gear" size={30} color="black" />
         </TouchableOpacity>
       </View>
@@ -80,39 +44,61 @@ const Header = ({img, name, organization, totalCareNumber}) => {
 };
 
 // 어르신 정보 카드
-const SeniorCard = ({elderlyId, name, age, address, contact, onCopy}) => {
+const SeniorCard = ({
+  uid,
+  name,
+  age,
+  address,
+  contact,
+  onCopy,
+  img,
+  assistantName,
+  elderlyId,
+  assistantId,
+}) => {
   const copyToClipboard = () => {
-    Clipboard.setString(elderlyId);
+    Clipboard.setString(uid);
     onCopy();
   };
+  const navigation = useNavigation();
 
   return (
     <View style={styles.card}>
       <View style={styles.cardIdContainer}>
-        <Text style={styles.cardId}>uid : {elderlyId}</Text>
+        <Text style={styles.cardId}>uid : {uid}</Text>
         <TouchableOpacity style={styles.copyButton} onPress={copyToClipboard}>
           <FeatherIcon name="copy" size={16} color="black" />
         </TouchableOpacity>
       </View>
       <View style={styles.cardContent}>
-        <Image
-          source={{uri: 'https://via.placeholder.com/150'}}
-          style={styles.cardImage}
-        />
+        <Image source={{uri: img}} style={styles.cardImage} />
         <View style={styles.cardTextContainer}>
           <Text style={styles.cardName}>
-            {name}({age})
+            {name}({age}살)
           </Text>
           <Text style={styles.cardAddress}>{address}</Text>
           <Text style={styles.cardPhone}>{contact}</Text>
         </View>
-        <TouchableOpacity
-          style={styles.cardBadgeContainer}
-          onPress={() => {
-            /* 아무 동작도 하지 않음 */
-          }}>
-          <Text style={styles.cardBadge}>AI 확인</Text>
-        </TouchableOpacity>
+        {assistantName ? (
+          <TouchableOpacity
+            style={styles.cardBadgeContainer}
+            onPress={() => {
+              navigation.navigate('EditAIScreen', {
+                elderlyId: elderlyId,
+                assistantId: assistantId,
+              });
+            }}>
+            <Text style={styles.cardBadge}>{assistantName}</Text>
+          </TouchableOpacity>
+        ) : (
+          <TouchableOpacity
+            style={styles.cardBadgeContainer}
+            onPress={() => {
+              navigation.navigate('CreateAIScreen', {elderlyId: elderlyId});
+            }}>
+            <Text style={styles.cardBadge}>+</Text>
+          </TouchableOpacity>
+        )}
       </View>
     </View>
   );
@@ -127,7 +113,7 @@ const ExpertMainScreen = () => {
   const [totalCareNumber, setTotalCareNumber] = useState(0);
   const navigation = useNavigation();
   useEffect(() => {
-    setSeniorData(tempData); // 임시 데이터 설정
+    console.warn = () => {};
     caregiver
       .info()
       .then(response => {
@@ -135,6 +121,8 @@ const ExpertMainScreen = () => {
         setName(response.data.data.name);
         setOrganization(response.data.data.organization);
         setTotalCareNumber(response.data.data.totalCareNumber);
+        setSeniorData(response.data.data.elderlyInfoDto);
+        console.log(JSON.stringify(response.data.data, null, 2));
       })
       .catch(error => {
         console.log(error.response.data);
@@ -164,12 +152,16 @@ const ExpertMainScreen = () => {
         {seniorData.map((senior, index) => (
           <SeniorCard
             key={index}
-            uid={senior.elderlyId}
+            uid={senior.accessCode}
             name={senior.name}
             age={senior.age}
-            address={senior.address}
+            address={senior.homeAddress}
             contact={senior.contact}
             onCopy={handleCopy}
+            img={senior.img}
+            elderlyId={senior.elderlyId}
+            assistantName={senior.assistantName}
+            assistantId={senior.assistantId}
           />
         ))}
       </ScrollView>
@@ -312,6 +304,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: 'bold',
     color: '#000',
+    textAlign: 'center',
   },
   copiedMessageContainer: {
     position: 'absolute',

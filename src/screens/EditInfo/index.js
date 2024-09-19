@@ -1,8 +1,54 @@
-import React from 'react';
-import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
+import React, {useEffect, useState} from 'react';
+import {
+  View,
+  Text,
+  Image,
+  StyleSheet,
+  TouchableOpacity,
+  Alert,
+} from 'react-native';
 import FontAwesome5Icon from 'react-native-vector-icons/FontAwesome5';
+import {caregiver} from '../../services/controller';
+import {useNavigation} from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const EditInfo = () => {
+  const navigation = useNavigation();
+  const [data, setData] = useState({});
+  const handleLogout = async () => {
+    Alert.alert('로그아웃', '정말 로그아웃하시겠습니까?', [
+      {
+        text: '취소',
+        onPress: () => console.log('로그아웃 취소'),
+        style: 'cancel',
+      },
+      {
+        text: '확인',
+        onPress: async () => {
+          try {
+            await AsyncStorage.removeItem('token');
+            navigation.reset({
+              index: 0,
+              routes: [{name: 'Login'}],
+            });
+          } catch (error) {
+            console.log(error.message);
+          }
+        },
+      },
+    ]);
+  };
+  useEffect(() => {
+    caregiver
+      .mypage()
+      .then(response => {
+        console.log(JSON.stringify(response.data.data, null, 2));
+        setData(response.data.data);
+      })
+      .catch(error => {
+        console.log(error.response.data);
+      });
+  }, []);
   const handleProfilePress = () => {
     // 프로필 이미지 클릭 시 동작(이미지 업로드 기능 추후 추가)
     console.log('프로필 이미지 클릭됨');
@@ -12,8 +58,12 @@ const EditInfo = () => {
     <View style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity style={styles.backButton}>
-          <Text style={styles.backButtonText}>{"<"}</Text>
+        <TouchableOpacity
+          style={styles.backButton}
+          onPress={() => {
+            navigation.goBack();
+          }}>
+          <Text style={styles.backButtonText}>{'<'}</Text>
         </TouchableOpacity>
         <Text style={styles.headerTitle}>내 정보</Text>
       </View>
@@ -21,12 +71,9 @@ const EditInfo = () => {
       {/* Profile Section */}
       <View style={styles.profileSection}>
         <TouchableOpacity onPress={handleProfilePress}>
-          <Image
-            source={{ uri: 'https://via.placeholder.com/150' }} // 실제 이미지 URL로 변경
-            style={styles.profileImage}
-          />
+          <Image source={{uri: data.imgUrl}} style={styles.profileImage} />
         </TouchableOpacity>
-        <Text style={styles.profileName}>정진아 요양사</Text>
+        <Text style={styles.profileName}>{data.name} 요양사</Text>
       </View>
 
       {/* Basic Information Section */}
@@ -35,7 +82,7 @@ const EditInfo = () => {
         <View style={styles.infoRow}>
           <Text style={styles.infoLabel}>이름</Text>
           <View style={styles.infoTextWithIcon}>
-            <Text style={styles.infoValue}>정진아</Text>
+            <Text style={styles.infoValue}>{data.name}</Text>
             <TouchableOpacity>
               <FontAwesome5Icon name="pen" size={16} color="black" />
             </TouchableOpacity>
@@ -44,7 +91,9 @@ const EditInfo = () => {
         <View style={styles.infoRow}>
           <Text style={styles.infoLabel}>성별</Text>
           <View style={styles.infoTextWithIcon}>
-            <Text style={styles.infoValue}>여</Text>
+            <Text style={styles.infoValue}>
+              {data.gender === 'MALE' ? '남' : '여'}
+            </Text>
             <TouchableOpacity>
               <FontAwesome5Icon name="pen" size={16} color="black" />
             </TouchableOpacity>
@@ -53,16 +102,7 @@ const EditInfo = () => {
         <View style={styles.infoRow}>
           <Text style={styles.infoLabel}>생년월일</Text>
           <View style={styles.infoTextWithIcon}>
-            <Text style={styles.infoValue}>1997년 4월 26일</Text>
-            <TouchableOpacity>
-              <FontAwesome5Icon name="pen" size={16} color="black" />
-            </TouchableOpacity>
-          </View>
-        </View>
-        <View style={styles.infoRow}>
-          <Text style={styles.infoLabel}>주거지</Text>
-          <View style={styles.infoTextWithIcon}>
-            <Text style={styles.infoValue}>제주시 제주대학로 113, 404호</Text>
+            <Text style={styles.infoValue}>{data.birthDate}</Text>
             <TouchableOpacity>
               <FontAwesome5Icon name="pen" size={16} color="black" />
             </TouchableOpacity>
@@ -71,7 +111,7 @@ const EditInfo = () => {
         <View style={styles.infoRow}>
           <Text style={styles.infoLabel}>소속기관</Text>
           <View style={styles.infoTextWithIcon}>
-            <Text style={styles.infoValue}>큰 푸른 숲 요양원</Text>
+            <Text style={styles.infoValue}>{data.organization}</Text>
             <TouchableOpacity>
               <FontAwesome5Icon name="pen" size={16} color="black" />
             </TouchableOpacity>
@@ -80,13 +120,34 @@ const EditInfo = () => {
         <View style={styles.infoRow}>
           <Text style={styles.infoLabel}>연락처</Text>
           <View style={styles.infoTextWithIcon}>
-            <Text style={styles.infoValue}>010-6844-3536</Text>
+            <Text style={styles.infoValue}>{data.contact}</Text>
             <TouchableOpacity>
               <FontAwesome5Icon name="pen" size={16} color="black" />
             </TouchableOpacity>
           </View>
         </View>
       </View>
+      <TouchableOpacity
+        style={{
+          backgroundColor: '#FCCB00',
+          paddingVertical: 15,
+          paddingHorizontal: 30,
+          borderRadius: 25,
+          alignItems: 'center',
+          justifyContent: 'center',
+          marginTop: 70,
+          marginHorizontal: 30,
+          shadowColor: '#000',
+          shadowOffset: {width: 0, height: 2},
+          shadowOpacity: 0.2,
+          shadowRadius: 5,
+          elevation: 5,
+        }}
+        onPress={handleLogout}>
+        <Text style={{color: '#fff', fontSize: 18, fontWeight: 'bold'}}>
+          로그아웃
+        </Text>
+      </TouchableOpacity>
     </View>
   );
 };
@@ -107,6 +168,7 @@ const styles = StyleSheet.create({
   backButton: {
     position: 'absolute',
     left: 20,
+    padding: 5,
   },
   backButtonText: {
     fontSize: 24,
