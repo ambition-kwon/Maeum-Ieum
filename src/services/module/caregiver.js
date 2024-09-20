@@ -52,6 +52,12 @@ const caregiver = {
       data,
     );
   },
+  infoElderly: elderlyId => {
+    return axiosInstance.get(`/caregivers/elderlys/${elderlyId}`);
+  },
+  editElderly: (elderlyId, data) => {
+    return axiosInstance.patch(`/caregivers/elderlys/${elderlyId}`, data);
+  },
 };
 
 export default caregiver;

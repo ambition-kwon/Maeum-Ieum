@@ -21,8 +21,10 @@ export default function Login() {
     try {
       const response = await caregiver.login(username, password);
       await AsyncStorage.setItem('token', response.headers.getAuthorization());
-      console.log(JSON.stringify(response.headers, null, 2));
-      navigation.navigate('ExpertMainScreen');
+      navigation.reset({
+        index: 0,
+        routes: [{name: 'ExpertMainScreen'}],
+      });
     } catch (error) {
       Alert.alert('오류', '로그인이 실패하였습니다.\n계정을 재 확인해 주세요.');
     }

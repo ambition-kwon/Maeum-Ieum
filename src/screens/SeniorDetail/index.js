@@ -1,27 +1,100 @@
-import React, { useState } from 'react';
-import { View, Text, Image, StyleSheet, TouchableOpacity, ScrollView, TextInput } from 'react-native';
-import { Picker } from '@react-native-picker/picker';
+import React, {useEffect, useState} from 'react';
+import {
+  View,
+  Text,
+  Image,
+  StyleSheet,
+  TouchableOpacity,
+  ScrollView,
+  TextInput,
+  Alert,
+} from 'react-native';
+import {Picker} from '@react-native-picker/picker';
+import {caregiver} from '../../services/controller';
+import {useNavigation, useRoute} from '@react-navigation/native';
 
 const SeniorDetail = () => {
   const [selectedDay, setSelectedDay] = useState('수요일마다 받을래요');
   const [isEditing, setIsEditing] = useState(false);
-  // 이것저것 테스트 해볼려고 추가한 임시 데이터라서 나중에 api 명세서 나오면 수정해야 함
+  const navigation = useNavigation();
+  const route = useRoute();
+  const {elderlyId} = route.params;
   const [profileData, setProfileData] = useState({
-    name: '권혁원',
-    gender: '남',
-    birthDate: '1997년 4월 26일',
-    address: '제주시 제주대학로 113, 404호',
-    organization: '큰 푸른 숲 요양원',
-    contact: '010-6844-3536',
-    specialNotes: '당뇨',
-    emergencyContactName: '권순수',
-    emergencyContactPhone: '010-9907-9969',
-    emergencyContactRelation: '손녀',
-    aiAssistantName: '권혁원 어르신 인공지능 어시스턴트',
+    imgUrl: 'https://via.placeholder.com/150',
+    uid: '',
+    name: '',
+    gender: '',
+    birthDate: '',
+    address: '',
+    organization: '',
+    contact: '',
+    specialNotes: '',
+    emergencyContactName: '',
+    emergencyContactPhone: '',
+    emergencyContactRelation: '',
+    aiAssistantName: '',
+    aiAssistantId: 0,
+    reportDay: '',
   });
 
-  const toggleEditing = () => {
-    setIsEditing(!isEditing);
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await caregiver.infoElderly(elderlyId);
+        setProfileData({
+          imgUrl:
+            response.data.data.imgUrl || 'https://via.placeholder.com/150',
+          uid: response.data.data.accessCode || '',
+          name: response.data.data.name || '',
+          gender: response.data.data.gender || '',
+          birthDate: response.data.data.birthDate || '',
+          homeAddress: response.data.data.homeAddress || '',
+          organization: response.data.data.organization || '',
+          contact: response.data.data.contact || '',
+          healthInfo: response.data.data.healthInfo || '',
+          emergencyName: response.data.data.emergencyName || '',
+          emergencyContact: response.data.data.emergencyContact || '',
+          emergencyRelationship: response.data.data.relationship || '',
+          aiAssistantName: response.data.data.assistantName || '',
+          aiAssistantId: response.data.data.assistantId || 0,
+          reportDay: response.data.data.reportDay || '',
+        });
+        console.log(JSON.stringify(response.data, null, 2));
+      } catch (error) {
+        console.log(error.response.data);
+      }
+    };
+    fetchData();
+  }, []);
+
+  const toggleEditing = async () => {
+    // 수정 전용 화면일 경우
+    if (isEditing) {
+      try {
+        const data = {
+          name: profileData.name,
+          gender: profileData.gender,
+          birthDate: profileData.birthDate,
+          homeAddress: profileData.homeAddress,
+          contact: profileData.contact,
+          healthInfo: profileData.healthInfo,
+          emergencyName: profileData.emergencyContactName,
+          emergencyContact: profileData.emergencyContactPhone,
+          relationship: profileData.emergencyContactRelation,
+          assistantName: profileData.assistantName,
+        };
+        await caregiver.editElderly(elderlyId, data);
+      } catch (error) {
+        Alert.alert('오류', JSON.stringify(error.response.data.data, null, 2));
+        console.log(error.response.data);
+      } finally {
+        setIsEditing(prev => !prev);
+      }
+    }
+    // 보기 전용 화면일 경우
+    else {
+      setIsEditing(prev => !prev);
+    }
   };
 
   const handleChange = (key, value) => {
@@ -37,11 +110,27 @@ const SeniorDetail = () => {
     }
   };
 
+  const handleBackPress = () => {
+    navigation.goBack();
+  };
+
+  const handleDateChange = text => {
+    const formattedDate = text.replace(/[^0-9-]/g, '');
+    const maxLength = 10;
+
+    if (formattedDate.length <= maxLength) {
+      setProfileData(prevState => ({
+        ...prevState,
+        birthDate: formattedDate,
+      }));
+    }
+  };
+
   return (
     <ScrollView contentContainerStyle={styles.scrollContainer}>
       <View style={styles.header}>
-        <TouchableOpacity style={styles.backButton}>
-          <Text style={styles.backButtonText}>{"<"}</Text>
+        <TouchableOpacity style={styles.backButton} onPress={handleBackPress}>
+          <Text style={styles.backButtonText}>{'<'}</Text>
         </TouchableOpacity>
         <Text style={styles.headerTitle}>어르신 상세정보</Text>
 
@@ -52,12 +141,12 @@ const SeniorDetail = () => {
             disabled={!isEditing} // 수정 모드가 아닐 때 비활성화
           >
             <Image
-              source={{ uri: 'https://via.placeholder.com/150' }} // 실제 이미지 URL로 교체
+              source={{uri: profileData.imgUrl}}
               style={styles.profileImage}
             />
           </TouchableOpacity>
-          <Text style={styles.profileName}>권혁원 어르신</Text>
-          <Text style={styles.profileUID}>uid: user3324981</Text>
+          <Text style={styles.profileName}>{profileData.name} 어르신</Text>
+          <Text style={styles.profileUID}>uid: {profileData.uid}</Text>
         </View>
       </View>
 
@@ -65,7 +154,9 @@ const SeniorDetail = () => {
         <View style={styles.infoHeader}>
           <Text style={styles.sectionTitle}>기본정보</Text>
           <TouchableOpacity onPress={toggleEditing}>
-            <Text style={styles.editButtonText}>{isEditing ? '저장하기' : '수정하기'}</Text>
+            <Text style={styles.editButtonText}>
+              {isEditing ? '저장하기' : '수정하기'}
+            </Text>
           </TouchableOpacity>
         </View>
         <View style={styles.infoRow}>
@@ -74,7 +165,7 @@ const SeniorDetail = () => {
             <TextInput
               style={styles.input}
               value={profileData.name}
-              onChangeText={(text) => handleChange('name', text)}
+              onChangeText={text => handleChange('name', text)}
             />
           ) : (
             <Text style={styles.infoValue}>{profileData.name}</Text>
@@ -83,11 +174,17 @@ const SeniorDetail = () => {
         <View style={styles.infoRow}>
           <Text style={styles.infoLabel}>성별</Text>
           {isEditing ? (
-            <TextInput
+            <Picker
+              selectedValue={profileData.gender}
               style={styles.input}
-              value={profileData.gender}
-              onChangeText={(text) => handleChange('gender', text)}
-            />
+              onValueChange={value => handleChange('gender', value)}>
+              <Picker.Item
+                label="성별을 선택해주세요"
+                value={`${profileData.gender}`}
+              />
+              <Picker.Item label="남자" value="MALE" />
+              <Picker.Item label="여자" value="FEMALE" />
+            </Picker>
           ) : (
             <Text style={styles.infoValue}>{profileData.gender}</Text>
           )}
@@ -95,10 +192,19 @@ const SeniorDetail = () => {
         <View style={styles.infoRow}>
           <Text style={styles.infoLabel}>생년월일</Text>
           {isEditing ? (
+            // <TextInput
+            //   style={styles.input}
+            //   value={profileData.birthDate}
+            //   onChangeText={text => handleChange('birthDate', text)}
+            // />
+            //수정 중 입니다. 추후 변동 가능성 높습니다.
             <TextInput
               style={styles.input}
               value={profileData.birthDate}
-              onChangeText={(text) => handleChange('birthDate', text)}
+              placeholder="YYYY-MM-DD"
+              onChangeText={handleDateChange}
+              keyboardType="numeric"
+              maxLength={10}
             />
           ) : (
             <Text style={styles.infoValue}>{profileData.birthDate}</Text>
@@ -109,11 +215,11 @@ const SeniorDetail = () => {
           {isEditing ? (
             <TextInput
               style={styles.input}
-              value={profileData.address}
-              onChangeText={(text) => handleChange('address', text)}
+              value={profileData.homeAddress}
+              onChangeText={text => handleChange('homeAddress', text)}
             />
           ) : (
-            <Text style={styles.infoValue}>{profileData.address}</Text>
+            <Text style={styles.infoValue}>{profileData.homeAddress}</Text>
           )}
         </View>
         <View style={styles.infoRow}>
@@ -122,7 +228,7 @@ const SeniorDetail = () => {
             <TextInput
               style={styles.input}
               value={profileData.organization}
-              onChangeText={(text) => handleChange('organization', text)}
+              onChangeText={text => handleChange('organization', text)}
             />
           ) : (
             <Text style={styles.infoValue}>{profileData.organization}</Text>
@@ -134,7 +240,7 @@ const SeniorDetail = () => {
             <TextInput
               style={styles.input}
               value={profileData.contact}
-              onChangeText={(text) => handleChange('contact', text)}
+              onChangeText={text => handleChange('contact', text)}
             />
           ) : (
             <Text style={styles.infoValue}>{profileData.contact}</Text>
@@ -145,11 +251,11 @@ const SeniorDetail = () => {
           {isEditing ? (
             <TextInput
               style={styles.input}
-              value={profileData.specialNotes}
-              onChangeText={(text) => handleChange('specialNotes', text)}
+              value={profileData.healthInfo}
+              onChangeText={text => handleChange('healthInfo', text)}
             />
           ) : (
-            <Text style={styles.infoValue}>{profileData.specialNotes}</Text>
+            <Text style={styles.infoValue}>{profileData.healthInfo}</Text>
           )}
         </View>
       </View>
@@ -160,16 +266,37 @@ const SeniorDetail = () => {
           <Picker
             selectedValue={selectedDay}
             style={styles.customPicker}
-            onValueChange={(itemValue) => setSelectedDay(itemValue)}
+            onValueChange={itemValue => setSelectedDay(itemValue)}
             enabled={isEditing} // 수정 모드일 때만 선택 가능
           >
-            <Picker.Item label="월요일마다 받을래요" value="월요일마다 받을래요" />
-            <Picker.Item label="화요일마다 받을래요" value="화요일마다 받을래요" />
-            <Picker.Item label="수요일마다 받을래요" value="수요일마다 받을래요" />
-            <Picker.Item label="목요일마다 받을래요" value="목요일마다 받을래요" />
-            <Picker.Item label="금요일마다 받을래요" value="금요일마다 받을래요" />
-            <Picker.Item label="토요일마다 받을래요" value="토요일마다 받을래요" />
-            <Picker.Item label="일요일마다 받을래요" value="일요일마다 받을래요" />
+            <Picker.Item
+              label="월요일마다 받을래요"
+              value="월요일마다 받을래요"
+            />
+            <Picker.Item
+              label="화요일마다 받을래요"
+              value="화요일마다 받을래요"
+            />
+            <Picker.Item
+              label="수요일마다 받을래요"
+              value="수요일마다 받을래요"
+            />
+            <Picker.Item
+              label="목요일마다 받을래요"
+              value="목요일마다 받을래요"
+            />
+            <Picker.Item
+              label="금요일마다 받을래요"
+              value="금요일마다 받을래요"
+            />
+            <Picker.Item
+              label="토요일마다 받을래요"
+              value="토요일마다 받을래요"
+            />
+            <Picker.Item
+              label="일요일마다 받을래요"
+              value="일요일마다 받을래요"
+            />
           </Picker>
         </View>
         <TouchableOpacity style={styles.customButton}>
@@ -179,9 +306,9 @@ const SeniorDetail = () => {
 
       <View style={styles.reportSection}>
         <Text style={styles.sectionTitle}>월간 보고서</Text>
-         <TouchableOpacity style={styles.customButton}>
-           <Text style={styles.customButtonText}>월간 보고서 확인</Text>
-         </TouchableOpacity>
+        <TouchableOpacity style={styles.customButton}>
+          <Text style={styles.customButtonText}>월간 보고서 확인</Text>
+        </TouchableOpacity>
       </View>
     </ScrollView>
   );
