@@ -63,7 +63,11 @@ const SeniorCard = ({
   const navigation = useNavigation();
 
   return (
-    <View style={styles.card}>
+    <TouchableOpacity
+      style={styles.card}
+      onPress={() => {
+        navigation.navigate('SeniorDetailScreen', {elderlyId: elderlyId});
+      }}>
       <View style={styles.cardIdContainer}>
         <Text style={styles.cardId}>uid : {uid}</Text>
         <TouchableOpacity style={styles.copyButton} onPress={copyToClipboard}>
@@ -74,7 +78,7 @@ const SeniorCard = ({
         <Image source={{uri: img}} style={styles.cardImage} />
         <View style={styles.cardTextContainer}>
           <Text style={styles.cardName}>
-            {name}({age}살)
+            {name} ({age}살)
           </Text>
           <Text style={styles.cardAddress}>{address}</Text>
           <Text style={styles.cardPhone}>{contact}</Text>
@@ -100,7 +104,7 @@ const SeniorCard = ({
           </TouchableOpacity>
         )}
       </View>
-    </View>
+    </TouchableOpacity>
   );
 };
 

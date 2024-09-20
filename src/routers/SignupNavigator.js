@@ -25,6 +25,7 @@ import RegisterComplete from '../screens/Register/RegisterComplete';
 import CreateAIScreen from '../screens/CreateAIScreen';
 import EditInfo from '../screens/EditInfo';
 import EditAIScreen from '../screens/EditAIScreen';
+import SeniorDetail from '../screens/SeniorDetail';
 
 const Stack = createStackNavigator();
 
@@ -150,6 +151,11 @@ export default function SignupNavigator() {
         <Stack.Screen
           name="MyPageScreen"
           component={EditInfo}
+          options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name="SeniorDetailScreen"
+          component={SeniorDetail}
           options={{headerShown: false}}
         />
       </Stack.Navigator>

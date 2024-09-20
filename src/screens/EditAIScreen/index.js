@@ -46,15 +46,27 @@ const EditAIScreen = () => {
 
   // 삭제하기 버튼을 눌렀을 때 실행되는 함수
   const handleDelete = async () => {
-    try {
-      await caregiver.deleteAI(elderlyId, assistantId);
-      navigation.reset({
-        index: 0,
-        routes: [{name: 'ExpertMainScreen'}],
-      });
-    } catch (error) {
-      console.log(error.response.data);
-    }
+    Alert.alert('주의', '정말로 삭제 하시겠습니까?', [
+      {
+        text: '취소',
+        onPress: () => console.log('삭제 취소'),
+        style: 'cancel',
+      },
+      {
+        text: '확인',
+        onPress: async () => {
+          try {
+            await caregiver.deleteAI(elderlyId, assistantId);
+            navigation.reset({
+              index: 0,
+              routes: [{name: 'ExpertMainScreen'}],
+            });
+          } catch (error) {
+            console.log(error.response.data);
+          }
+        },
+      },
+    ]);
   };
 
   // 규칙 자동 완성 버튼을 눌렀을 때 실행되는 함수

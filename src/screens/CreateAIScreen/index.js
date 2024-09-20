@@ -22,6 +22,7 @@ const CreateAIScreen = () => {
   const route = useRoute();
   const {elderlyId} = route.params;
   const navigation = useNavigation();
+
   // 생성하기 버튼을 눌렀을 때 실행되는 함수
   const handleCreate = async () => {
     try {
