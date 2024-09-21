@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -11,11 +11,11 @@ import {
 import FontistoIcon from 'react-native-vector-icons/Fontisto';
 import OcticonsIcon from 'react-native-vector-icons/Octicons';
 import FeatherIcon from 'react-native-vector-icons/Feather';
-import {caregiver} from '../../services/controller';
-import {useNavigation} from '@react-navigation/native';
+import { caregiver } from '../../services/controller';
+import { useNavigation } from '@react-navigation/native';
 
 // 전문가의 정보가 표시되는 header 영역
-const Header = ({img, name, organization, totalCareNumber}) => {
+const Header = ({ img, name, organization, totalCareNumber }) => {
   const navigation = useNavigation();
   return (
     <View style={styles.header}>
@@ -30,7 +30,7 @@ const Header = ({img, name, organization, totalCareNumber}) => {
         </TouchableOpacity>
       </View>
       <View style={styles.profileContainer}>
-        <Image source={{uri: img}} style={styles.profileImage} />
+        <Image source={{ uri: img }} style={styles.profileImage} />
         <View style={styles.infoContainer}>
           <Text style={styles.nameText}>{name} 요양사님</Text>
           <Text style={styles.centerText}>{organization}</Text>
@@ -66,7 +66,7 @@ const SeniorCard = ({
     <TouchableOpacity
       style={styles.card}
       onPress={() => {
-        navigation.navigate('SeniorDetailScreen', {elderlyId: elderlyId});
+        navigation.navigate('SeniorDetailScreen', { elderlyId: elderlyId });
       }}>
       <View style={styles.cardIdContainer}>
         <Text style={styles.cardId}>uid : {uid}</Text>
@@ -75,7 +75,7 @@ const SeniorCard = ({
         </TouchableOpacity>
       </View>
       <View style={styles.cardContent}>
-        <Image source={{uri: img}} style={styles.cardImage} />
+        <Image source={{ uri: img }} style={styles.cardImage} />
         <View style={styles.cardTextContainer}>
           <Text style={styles.cardName}>
             {name} ({age}살)
@@ -98,7 +98,7 @@ const SeniorCard = ({
           <TouchableOpacity
             style={styles.cardBadgeContainer}
             onPress={() => {
-              navigation.navigate('CreateAIScreen', {elderlyId: elderlyId});
+              navigation.navigate('CreateAIScreen', { elderlyId: elderlyId });
             }}>
             <Text style={styles.cardBadge}>+</Text>
           </TouchableOpacity>
@@ -116,8 +116,8 @@ const ExpertMainScreen = () => {
   const [organization, setOrganization] = useState('');
   const [totalCareNumber, setTotalCareNumber] = useState(0);
   const navigation = useNavigation();
+
   useEffect(() => {
-    console.warn = () => {};
     caregiver
       .info()
       .then(response => {
@@ -126,11 +126,9 @@ const ExpertMainScreen = () => {
         setOrganization(response.data.data.organization);
         setTotalCareNumber(response.data.data.totalCareNumber);
         setSeniorData(response.data.data.elderlyInfoDto);
-        console.log(JSON.stringify(response.data.data, null, 2));
       })
       .catch(error => {
         console.log(error.response.data);
-        //강제 로그아웃
         navigation.navigate('Login');
       });
   }, []);
@@ -153,21 +151,23 @@ const ExpertMainScreen = () => {
         totalCareNumber={totalCareNumber}
       />
       <ScrollView contentContainerStyle={styles.scrollContainer}>
-        {seniorData.map((senior, index) => (
-          <SeniorCard
-            key={index}
-            uid={senior.accessCode}
-            name={senior.name}
-            age={senior.age}
-            address={senior.homeAddress}
-            contact={senior.contact}
-            onCopy={handleCopy}
-            img={senior.img}
-            elderlyId={senior.elderlyId}
-            assistantName={senior.assistantName}
-            assistantId={senior.assistantId}
-          />
-        ))}
+        <View style={styles.innerContainer}>
+          {seniorData.map((senior, index) => (
+            <SeniorCard
+              key={index}
+              uid={senior.accessCode}
+              name={senior.name}
+              age={senior.age}
+              address={senior.homeAddress}
+              contact={senior.contact}
+              onCopy={handleCopy}
+              img={senior.img}
+              elderlyId={senior.elderlyId}
+              assistantName={senior.assistantName}
+              assistantId={senior.assistantId}
+            />
+          ))}
+        </View>
       </ScrollView>
       {showCopiedMessage && (
         <View style={styles.copiedMessageContainer}>
@@ -188,11 +188,16 @@ const styles = StyleSheet.create({
     backgroundColor: '#FCCB02',
   },
   scrollContainer: {
+    flexGrow: 1,
+    justifyContent: 'center'
+  },
+  innerContainer: {
     borderTopLeftRadius: 30,
     borderTopRightRadius: 30,
     alignItems: 'center',
     backgroundColor: '#FFF',
     paddingVertical: 20,
+    width: '100%',
   },
   header: {
     flexDirection: 'column',
@@ -201,6 +206,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#FCCB02',
     padding: 20,
     width: '100%',
+    borderBottomLeftRadius: 30,
+    borderBottomRightRadius: 30,
   },
   profileContainer: {
     flexDirection: 'row',
@@ -247,7 +254,7 @@ const styles = StyleSheet.create({
     marginVertical: 10,
     width: '90%',
     shadowColor: '#000',
-    shadowOffset: {width: 0, height: 4},
+    shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.1,
     shadowRadius: 5,
     elevation: 5,
@@ -335,7 +342,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     shadowColor: '#000',
-    shadowOffset: {width: 0, height: 4},
+    shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
     elevation: 5,
