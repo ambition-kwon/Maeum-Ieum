@@ -38,10 +38,12 @@ export default function AdminApprove() {
       setCountdown(prevCountdown => {
         if (prevCountdown === 1) {
           clearInterval(timer); // 타이머 해제
-          // 네비게이션은 애니메이션 종료 후 진행
+          // 네비게이션은 상태가 완전히 업데이트된 후 실행되도록 setTimeout으로 시간 지연
           fadeInAnimation.stop();
           scaleAnimation.stop();
-          navigation.navigate('Login');
+          setTimeout(() => {
+            navigation.navigate('Login');
+          }, 500); // 0.5초 지연 후 이동
         }
         return prevCountdown - 1;
       });

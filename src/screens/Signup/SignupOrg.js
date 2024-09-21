@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -8,28 +8,42 @@ import {
   FlatList,
   TouchableWithoutFeedback,
   Alert,
+  Keyboard,
 } from 'react-native';
-import {useNavigation, useRoute} from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import IoniconsIcons from 'react-native-vector-icons/Ionicons';
 import SimpleLineIcons from 'react-native-vector-icons/SimpleLineIcons';
-
-const dummyData = [
-  '행복 복지관',
-  '사랑 복지관',
-  '사랑 요양원',
-  '사랑나눔 요양원',
-  '꿈누리 요양원',
-  '하늘꿈 요양원',
-];
+import { dummyData } from './NursingHomeData';
 
 export default function SignupOrg() {
   const [searchText, setSearchText] = useState('');
   const [filteredData, setFilteredData] = useState([]);
   const [showList, setShowList] = useState(false);
+  const [keyboardVisible, setKeyboardVisible] = useState(false);
   const navigation = useNavigation();
   const route = useRoute();
-  const {username, password, realname, selectedGender, formattedDate} =
+  const { username, password, realname, selectedGender, formattedDate } =
     route.params;
+
+  useEffect(() => {
+    const keyboardDidShowListener = Keyboard.addListener(
+      'keyboardDidShow',
+      () => {
+        setKeyboardVisible(true);
+      },
+    );
+    const keyboardDidHideListener = Keyboard.addListener(
+      'keyboardDidHide',
+      () => {
+        setKeyboardVisible(false);
+      },
+    );
+
+    return () => {
+      keyboardDidHideListener.remove();
+      keyboardDidShowListener.remove();
+    };
+  }, []);
 
   const handleNextPress = () => {
     if (searchText !== '' && showList === false) {
@@ -49,25 +63,57 @@ export default function SignupOrg() {
     }
   };
 
-  const handleSearch = text => {
+  // 한글 초성 추출 함수
+  const getInitialSound = (str) => {
+    const cho = [
+      'ㄱ', 'ㄲ', 'ㄴ', 'ㄷ', 'ㄸ', 'ㄹ', 'ㅁ', 'ㅂ', 'ㅃ', 'ㅅ', 'ㅆ', 'ㅇ', 'ㅈ', 'ㅉ', 'ㅊ', 'ㅋ', 'ㅌ', 'ㅍ', 'ㅎ',
+    ];
+    const result = [];
+
+    for (let i = 0; i < str.length; i++) {
+      const code = str.charCodeAt(i) - 44032;
+
+      if (code > -1 && code < 11172) {
+        const choIndex = Math.floor(code / 588);
+        result.push(cho[choIndex]);
+      } else {
+        result.push(str[i]);
+      }
+    }
+    return result.join('');
+  };
+
+  const handleSearch = (text) => {
     setSearchText(text);
+
     if (text === '') {
       setShowList(false);
       setFilteredData([]);
     } else {
-      const filtered = dummyData.filter(item => item.includes(text));
+      const filtered = dummyData.filter((item) => {
+        const initialSound = getInitialSound(item.name); // 기관명에 대한 초성 추출
+        const searchInitialSound = getInitialSound(text); // 입력된 텍스트의 초성 추출
+
+        // 문자열의 첫 글자나 초성이 입력된 텍스트와 정확히 일치하는지 확인
+        return (
+          item.name.startsWith(text) || // 기본 검색: 기관명이 입력된 텍스트로 시작하는지 확인
+          initialSound.startsWith(searchInitialSound) // 초성 검색: 초성이 입력된 텍스트로 시작하는지 확인
+        );
+      });
+
       setFilteredData(filtered);
-      setShowList(true);
+      setShowList(filtered.length > 0); // 검색 결과가 있을 때만 showList를 true로 설정
     }
   };
 
-  const handleItemPress = item => {
-    setSearchText(item);
+
+  const handleItemPress = (item) => {
+    setSearchText(item.name);
     setShowList(false);
   };
 
   return (
-    <TouchableWithoutFeedback onPress={() => setShowList(false)}>
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <View style={styles.container}>
         <View style={styles.progressContainer}>
           <View style={styles.complete}></View>
@@ -99,31 +145,39 @@ export default function SignupOrg() {
           </View>
         </View>
 
-        {showList && (
+        {/* 검색 결과가 있을 때만 FlatList를 렌더링 */}
+        {showList && filteredData.length > 0 && (
           <FlatList
             data={filteredData}
             keyExtractor={(item, index) => index.toString()}
-            renderItem={({item}) => (
+            renderItem={({ item }) => (
               <TouchableOpacity
                 onPress={() => handleItemPress(item)}
                 style={styles.listItem}>
-                <Text style={styles.itemText}>{item}</Text>
+                <Text style={styles.nameText}>{item.name}</Text>
+                <Text style={styles.itemText}>운영시간: {item.hours}</Text>
+                <Text style={styles.itemText}>도로명: {item.address}</Text>
+                <Text style={styles.itemText}>지번: {item.lot}</Text>
               </TouchableOpacity>
             )}
             style={styles.listContainer}
+            showsVerticalScrollIndicator={false}
+            scrollEnabled={true}
           />
         )}
 
-        <TouchableOpacity
-          style={styles.nextIconContainer}
-          onPress={handleNextPress}
-          activeOpacity={0.7}>
-          <IoniconsIcons
-            name="arrow-forward-circle"
-            size={50}
-            color="#FCCB02"
-          />
-        </TouchableOpacity>
+        {!keyboardVisible && (
+          <TouchableOpacity
+            style={styles.nextIconContainer}
+            onPress={handleNextPress}
+            activeOpacity={0.7}>
+            <IoniconsIcons
+              name="arrow-forward-circle"
+              size={50}
+              color="#FCCB02"
+            />
+          </TouchableOpacity>
+        )}
       </View>
     </TouchableWithoutFeedback>
   );
@@ -170,14 +224,12 @@ const styles = StyleSheet.create({
   searchContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 20,
   },
   searchWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
     borderBottomWidth: 1,
     borderBottomColor: '#DDD',
-    marginBottom: 10,
   },
   searchInput: {
     flex: 1,
@@ -194,16 +246,19 @@ const styles = StyleSheet.create({
     resizeMode: 'contain',
   },
   listContainer: {
-    maxHeight: 200,
+    maxHeight: 250,
     borderWidth: 1,
     borderColor: '#CCCCCC',
-    borderRadius: 5,
     backgroundColor: '#FFF',
   },
   listItem: {
     padding: 10,
     borderBottomWidth: 1,
     borderBottomColor: '#CCCCCC',
+  },
+  nameText: {
+    fontSize: 20,
+    color: 'black',
   },
   itemText: {
     fontSize: 16,
