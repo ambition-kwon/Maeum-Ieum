@@ -198,6 +198,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFF',
     paddingVertical: 20,
     width: '100%',
+    minHeight: '100%',
   },
   header: {
     flexDirection: 'column',
