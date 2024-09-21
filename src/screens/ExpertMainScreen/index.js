@@ -14,7 +14,6 @@ import FeatherIcon from 'react-native-vector-icons/Feather';
 import { caregiver } from '../../services/controller';
 import { useNavigation } from '@react-navigation/native';
 
-// 전문가의 정보가 표시되는 header 영역
 const Header = ({ img, name, organization, totalCareNumber }) => {
   const navigation = useNavigation();
   return (
@@ -43,7 +42,6 @@ const Header = ({ img, name, organization, totalCareNumber }) => {
   );
 };
 
-// 어르신 정보 카드
 const SeniorCard = ({
   uid,
   name,
@@ -56,20 +54,20 @@ const SeniorCard = ({
   elderlyId,
   assistantId,
 }) => {
+  const navigation = useNavigation();
+
   const copyToClipboard = () => {
     Clipboard.setString(uid);
     onCopy();
   };
-  const navigation = useNavigation();
 
   return (
     <TouchableOpacity
       style={styles.card}
-      onPress={() => {
-        navigation.navigate('SeniorDetailScreen', { elderlyId: elderlyId });
-      }}>
+      onPress={() => navigation.navigate('SeniorDetailScreen', { elderlyId })}
+      >
       <View style={styles.cardIdContainer}>
-        <Text style={styles.cardId}>uid : {uid}</Text>
+        <Text style={styles.cardId}>uid: {uid}</Text>
         <TouchableOpacity style={styles.copyButton} onPress={copyToClipboard}>
           <FeatherIcon name="copy" size={16} color="black" />
         </TouchableOpacity>
@@ -86,20 +84,16 @@ const SeniorCard = ({
         {assistantName ? (
           <TouchableOpacity
             style={styles.cardBadgeContainer}
-            onPress={() => {
-              navigation.navigate('EditAIScreen', {
-                elderlyId: elderlyId,
-                assistantId: assistantId,
-              });
-            }}>
+            onPress={() => navigation.navigate('EditAIScreen', {
+              elderlyId,
+              assistantId,
+            })}>
             <Text style={styles.cardBadge}>{assistantName}</Text>
           </TouchableOpacity>
         ) : (
           <TouchableOpacity
             style={styles.cardBadgeContainer}
-            onPress={() => {
-              navigation.navigate('CreateAIScreen', { elderlyId: elderlyId });
-            }}>
+            onPress={() => navigation.navigate('CreateAIScreen', { elderlyId })}>
             <Text style={styles.cardBadge}>+</Text>
           </TouchableOpacity>
         )}
@@ -152,21 +146,27 @@ const ExpertMainScreen = () => {
       />
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         <View style={styles.innerContainer}>
-          {seniorData.map((senior, index) => (
-            <SeniorCard
-              key={index}
-              uid={senior.accessCode}
-              name={senior.name}
-              age={senior.age}
-              address={senior.homeAddress}
-              contact={senior.contact}
-              onCopy={handleCopy}
-              img={senior.img}
-              elderlyId={senior.elderlyId}
-              assistantName={senior.assistantName}
-              assistantId={senior.assistantId}
-            />
-          ))}
+          {seniorData.length > 0 ? (
+            seniorData.map((senior, index) => (
+              <SeniorCard
+                key={index}
+                uid={senior.accessCode}
+                name={senior.name}
+                age={senior.age}
+                address={senior.homeAddress}
+                contact={senior.contact}
+                onCopy={handleCopy}
+                img={senior.img}
+                elderlyId={senior.elderlyId}
+                assistantName={senior.assistantName}
+                assistantId={senior.assistantId}
+              />
+            ))
+          ) : (
+            <Text style={styles.noDataText}>
+              담당 어르신을 새롭게 추가해주세요.
+            </Text>
+          )}
         </View>
       </ScrollView>
       {showCopiedMessage && (
@@ -181,7 +181,7 @@ const ExpertMainScreen = () => {
   );
 };
 
-// style 정의
+// 스타일 정의
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -189,7 +189,7 @@ const styles = StyleSheet.create({
   },
   scrollContainer: {
     flexGrow: 1,
-    justifyContent: 'center'
+    justifyContent: 'center',
   },
   innerContainer: {
     borderTopLeftRadius: 30,
@@ -221,6 +221,18 @@ const styles = StyleSheet.create({
   },
   infoContainer: {
     marginLeft: 20,
+  },
+  centeredScrollContainer: {
+    flexGrow: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  noDataText: {
+    marginTop: 220, // justifyContent가 제대로 작동하지 않아 marginTop으로 대체
+    textAlign: 'center',
+    color: '#FCCB02',
+    fontSize: 20,
+    fontWeight: 'bold',
   },
   nameText: {
     color: '#000',
