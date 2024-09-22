@@ -1,13 +1,13 @@
-import React, { useEffect } from 'react';
-import { View, Text, Image, StyleSheet, SafeAreaView } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import React, {useEffect} from 'react';
+import {View, Text, Image, StyleSheet, SafeAreaView} from 'react-native';
+import {useNavigation} from '@react-navigation/native';
 
 export default function SplashScreen() {
   const navigation = useNavigation();
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      navigation.replace('Login');
+      navigation.replace('CodeLogin');
     }, 3000);
     return () => clearTimeout(timer);
   }, [navigation]);
@@ -15,7 +15,10 @@ export default function SplashScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.imageContainer}>
-        <Image source={require('../../assets/icons/logo.png')} style={styles.image} />
+        <Image
+          source={require('../../assets/icons/logo.png')}
+          style={styles.image}
+        />
       </View>
       <View style={styles.textContainer}>
         <Text style={styles.text}>마음이음</Text>

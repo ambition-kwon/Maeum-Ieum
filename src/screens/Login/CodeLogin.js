@@ -1,16 +1,34 @@
-import React from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import React, {useState} from 'react';
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+} from 'react-native';
+import {useNavigation} from '@react-navigation/native';
+import {elderly} from '../../services/controller';
 
 export default function CodeLogin() {
   const navigation = useNavigation();
+  const [accessCode, setAccessCode] = useState('');
+  const handleLogin = async () => {
+    try {
+      const response = await elderly.signin(accessCode);
+      navigation.navigate('SeniorMainScreen', {
+        assistantId: response.data.data.assistantId,
+        elderlyId: response.data.data.elderlyId,
+      });
+    } catch (error) {
+      console.log(JSON.stringify(error.response, null, 2));
+    }
+  };
 
   return (
     <View style={styles.container}>
       <View style={styles.titleContainer}>
         <Text style={styles.welcomeText}>
-          <Text style={styles.highlightedText}>마음이음</Text>
-          에
+          <Text style={styles.highlightedText}>마음이음</Text>에
         </Text>
         <Text style={styles.welcomeText}>오신 것을 환영합니다!</Text>
       </View>
@@ -23,11 +41,13 @@ export default function CodeLogin() {
             style={styles.input}
             placeholder="전달받은 코드를 입력해 주세요."
             placeholderTextColor="#B0B0B0"
-            keyboardType="numeric"  // 숫자 키보드를 기본으로 설정
+            keyboardType={'default'}
+            value={accessCode}
+            onChangeText={setAccessCode}
           />
         </View>
       </View>
-      <TouchableOpacity style={styles.continueButton}>
+      <TouchableOpacity style={styles.continueButton} onPress={handleLogin}>
         <Text style={styles.continueButtonText}>계속하기</Text>
       </TouchableOpacity>
       <TouchableOpacity onPress={() => navigation.navigate('Login')}>

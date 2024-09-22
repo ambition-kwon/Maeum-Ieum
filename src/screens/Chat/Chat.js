@@ -1,8 +1,20 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image, Animated, Easing, ScrollView, TextInput } from 'react-native'; // TextInput 추가
+import React, {useState, useRef, useEffect} from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Image,
+  Animated,
+  Easing,
+  ScrollView,
+  TextInput,
+} from 'react-native'; // TextInput 추가
 import SimpleLineIcons from 'react-native-vector-icons/SimpleLineIcons';
 import IoniconsIcon from 'react-native-vector-icons/Ionicons';
 import FeatherIcon from 'react-native-vector-icons/Feather';
+import {elderly} from '../../services/controller';
+import {useRoute} from '@react-navigation/native';
 
 const dummyData = [
   '오늘은 담당 요양사가 방문하는 날입니다! 오늘은 담당 요양사가 방문하는 날입니다! 오늘은 담당 요양사가 방문하는 날입니다! 오늘은 담당 요양사가 방문하는 날입니다!',
@@ -12,14 +24,93 @@ export default function Chat() {
   const [isRecording, setIsRecording] = useState(false);
   const [selectedGender, setSelectedGender] = useState('male'); // 기본 값은 male로 설정해뒀음
   const spinValue = useRef(new Animated.Value(0)).current;
+  const [requestText, setRequestText] = useState('');
+  const route = useRoute();
+  const {threadId, openAiAssistantId, elderlyId} = route.params;
+  const [streamResponse, setStreamResponse] = useState(''); // 실시간 응답 상태
+  const [isLoading, setIsLoading] = useState(false); // 로딩 상태
+  const [error, setError] = useState(null); // 오류 상태
+  const [finalTimestamp, setFinalTimestamp] = useState(false);
 
   const handleMicPress = () => {
     setIsRecording(prevState => !prevState);
   };
 
-  const handleSend = () => {
-    console.log('보내기');
+  const handleSend = async () => {
+    try {
+      const data = {
+        content: requestText,
+        openAiAssistantId: openAiAssistantId,
+        threadId: threadId,
+      };
+      const response = await elderly.getStreamText(elderlyId, data);
+      console.log(response.data);
+    } catch (error) {
+      console.log(JSON.stringify(error.response.data, null, 2));
+    }
   };
+  // const handleSend = async () => {
+  //   setStreamResponse(''); // 이전 응답 초기화
+  //   setError(null); // 오류 초기화
+  //   setIsLoading(true); // 로딩 시작
+  //
+  //   const data = {
+  //     content: requestText,
+  //     openAiAssistantId: openAiAssistantId,
+  //     threadId: threadId,
+  //   };
+  //
+  //   try {
+  //     const response = await fetch(
+  //       `https://port-0-maeum-ieum-test-m0nh6gqqc01cecdf.sel4.cloudtype.app/elderlys/${elderlyId}/stream-message`,
+  //       {
+  //         method: 'POST',
+  //         headers: {
+  //           'Content-Type': 'application/json',
+  //         },
+  //         body: JSON.stringify(data),
+  //       },
+  //     );
+  //
+  //     if (!response.ok) {
+  //       throw new Error('Network response was not ok');
+  //     }
+  //
+  //     // 스트림 처리
+  //     const reader = response.body.getReader();
+  //     const decoder = new TextDecoder('utf-8');
+  //     let isLast = false;
+  //
+  //     while (!isLast) {
+  //       const {value, done} = await reader.read(); // 스트림에서 데이터 읽기
+  //       const chunk = decoder.decode(value, {stream: true});
+  //
+  //       if (chunk) {
+  //         const parsedChunk = JSON.parse(chunk); // JSON으로 변환
+  //
+  //         parsedChunk.forEach(item => {
+  //           if (item.answer !== null) {
+  //             setStreamResponse(prev => prev + item.answer); // 실시간 응답 추가
+  //           }
+  //           if (item.isLast) {
+  //             isLast = true; // 마지막 데이터 처리
+  //             setFinalTimestamp(item.timeStamp);
+  //           }
+  //         });
+  //       }
+  //
+  //       if (done) {
+  //         break; // 스트림이 끝나면 루프 종료
+  //       }
+  //     }
+  //
+  //     setIsLoading(false); // 로딩 완료
+  //   } catch (err) {
+  //     setError('Error fetching stream data');
+  //     console.error('Error:', err);
+  //     setIsLoading(false); // 로딩 완료
+  //   }
+  // };
 
   useEffect(() => {
     // 로딩 스피너의 회전 애니메이션
@@ -29,7 +120,7 @@ export default function Chat() {
         duration: 1500, // 회전 주기 (숫자가 낮을 수록 빠르게 돌아감)
         easing: Easing.linear,
         useNativeDriver: true,
-      })
+      }),
     ).start();
   }, [spinValue]);
 
@@ -61,16 +152,21 @@ export default function Chat() {
           </TouchableOpacity>
         </View>
 
-        <TouchableOpacity style={styles.previousConversationButton} onPress={() => { console.log('이전'); }}>
-          <Text style={styles.previousConversationText}>이전 대화 확인하기</Text>
+        <TouchableOpacity
+          style={styles.previousConversationButton}
+          onPress={() => {
+            console.log('이전');
+          }}>
+          <Text style={styles.previousConversationText}>
+            이전 대화 확인하기
+          </Text>
         </TouchableOpacity>
 
         <ScrollView
           style={styles.scrollTop}
           contentContainerStyle={styles.topHalfContent}
-          showsVerticalScrollIndicator={false}
-        >
-          <Text style={styles.topText}>{dummyData[0]}</Text>
+          showsVerticalScrollIndicator={false}>
+          <Text style={styles.topText}>{streamResponse}</Text>
         </ScrollView>
 
         {/* 로딩 스피너 부분
@@ -80,15 +176,13 @@ export default function Chat() {
           <Text style={styles.loadingText}>고민하는 중이에요...</Text>
         </View>
         */}
-
       </View>
 
       <View style={styles.bottomHalf}>
         <ScrollView
           style={styles.scrollBottom}
           contentContainerStyle={styles.bottomHalfContent}
-          showsVerticalScrollIndicator={false}
-        >
+          showsVerticalScrollIndicator={false}>
           <Text style={styles.bottomText}>{dummyData[0]}</Text>
         </ScrollView>
       </View>
@@ -111,13 +205,20 @@ export default function Chat() {
         <TextInput
           style={styles.textInput}
           placeholder="이음이는 어르신을 기다리고 있어요!"
+          keyboardType={'default'}
+          value={requestText}
+          onChangeText={setRequestText}
         />
         <TouchableOpacity style={styles.sendButton} onPress={handleSend}>
           <FeatherIcon name="send" size={25} color="#3369FF" />
         </TouchableOpacity>
       </View>
 
-      <TouchableOpacity style={styles.closeButton} onPress={() => { console.log('닫기'); }}>
+      <TouchableOpacity
+        style={styles.closeButton}
+        onPress={() => {
+          console.log('닫기');
+        }}>
         <FeatherIcon name="x" size={35} color="black" />
       </TouchableOpacity>
     </View>

@@ -26,6 +26,8 @@ import CreateAIScreen from '../screens/CreateAIScreen';
 import EditInfo from '../screens/EditInfo';
 import EditAIScreen from '../screens/EditAIScreen';
 import SeniorDetail from '../screens/SeniorDetail';
+import Main from '../screens/Main/Main';
+import Chat from '../screens/Chat/Chat';
 
 const Stack = createStackNavigator();
 
@@ -156,6 +158,16 @@ export default function SignupNavigator() {
         <Stack.Screen
           name="SeniorDetailScreen"
           component={SeniorDetail}
+          options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name="SeniorMainScreen"
+          component={Main}
+          options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name="SeniorChatScreen"
+          component={Chat}
           options={{headerShown: false}}
         />
       </Stack.Navigator>

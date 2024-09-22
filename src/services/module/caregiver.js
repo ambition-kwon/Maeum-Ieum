@@ -30,6 +30,17 @@ const caregiver = {
   mypage: () => {
     return axiosInstance.get(`/caregivers/mypage`);
   },
+  editMypage: data => {
+    return axiosInstance.patch(`/caregivers/mypage`, data);
+  },
+  editMypageImg: data => {
+    return axiosInstance.patch(`/caregivers/mypage/image`, data, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+        Accept: 'application/json',
+      },
+    });
+  },
   createAI: (elderlyId, data) => {
     return axiosInstance.post(
       `/caregivers/elderlys/${elderlyId}/assistants`,
@@ -57,6 +68,19 @@ const caregiver = {
   },
   editElderly: (elderlyId, data) => {
     return axiosInstance.patch(`/caregivers/elderlys/${elderlyId}`, data);
+  },
+  editReportDay: (elderlyId, reportDay) => {
+    return axiosInstance.patch(`/caregivers/elderlys/${elderlyId}/report`, {
+      reportDay: reportDay,
+    });
+  },
+  infoEmergency: (page, size) => {
+    return axiosInstance.get('/caregivers/emergency-alerts', {
+      params: {
+        page: page,
+        size: size,
+      },
+    });
   },
 };
 

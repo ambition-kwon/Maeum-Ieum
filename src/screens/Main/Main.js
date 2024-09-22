@@ -1,12 +1,86 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image, BackHandler } from 'react-native';
-import SimpleLineIcons from 'react-native-vector-icons/SimpleLine';
+import React, {useState, useEffect} from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Image,
+  BackHandler,
+  Alert,
+} from 'react-native';
+// import SimpleLineIcons from 'react-native-vector-icons/SimpleLine';
 import FontAwesome5Icon from 'react-native-vector-icons/FontAwesome5';
 import FontAwesome6Icon from 'react-native-vector-icons/FontAwesome6';
 import OcticonsIcon from 'react-native-vector-icons/Octicons';
+import {useNavigation, useRoute} from '@react-navigation/native';
+import {elderly} from '../../services/controller';
 
 export default function Main() {
   const [showHelpButtons, setShowHelpButtons] = useState(false);
+  const navigation = useNavigation();
+  const route = useRoute();
+  const {assistantId, elderlyId} = route.params;
+  const [data, setData] = useState({
+    caregiverName: '',
+    caregiverId: null,
+    caregiverContact: '',
+    caregiverOrganization: '',
+    caregiverImgUrl: 'https://via.placeholder.com/150',
+    elderlyName: '',
+    elderlyBirthdate: '',
+    elderlyImgUrl: '',
+    lastChatDate: null,
+    age: 0,
+  });
+
+  const handleCaregiverNotification = async () => {
+    try {
+      await elderly.emergencyAlert(elderlyId, data.caregiverId);
+      Alert.alert(
+        '알림',
+        `${data.caregiverName}요양사님께 긴급알림을 성공적으로 전송하였습니다.`,
+      );
+    } catch (error) {
+      console.log(JSON.stringify(error.response.data, null, 2));
+    }
+  };
+
+  const handleAccessChat = async () => {
+    try {
+      const response = await elderly.accessChat(elderlyId, assistantId);
+      console.log(JSON.stringify(response.data.data, null, 2));
+      navigation.navigate('SeniorChatScreen', {
+        threadId: response.data.data.threadId,
+        openAiAssistantId: response.data.data.openAiAssistantId,
+        elderlyId: elderlyId,
+      });
+    } catch (error) {
+      console.log(JSON.stringify(error.response.data, null, 2));
+    }
+  };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await elderly.mainInfo(elderlyId, assistantId);
+        setData({
+          caregiverName: response.data.data.caregiverName,
+          caregiverId: response.data.data.caregiverId,
+          caregiverContact: response.data.data.caregiverContact,
+          caregiverOrganization: response.data.data.caregiverOrganization,
+          caregiverImgUrl: response.data.data.caregiverImgUrl,
+          elderlyName: response.data.data.elderlyName,
+          elderlyBirthdate: response.data.data.elderlyBirthdate,
+          elderlyImgUrl: response.data.data.elderlyImgUrl,
+          lastChatDate: response.data.data.lastChatDate,
+          age: response.data.data.age,
+        });
+      } catch (error) {
+        console.log(JSON.stringify(error.response.data, null, 2));
+      }
+    };
+    fetchData();
+  }, []);
 
   useEffect(() => {
     const backAction = () => {
@@ -19,7 +93,7 @@ export default function Main() {
 
     const backHandler = BackHandler.addEventListener(
       'hardwareBackPress',
-      backAction
+      backAction,
     );
 
     return () => backHandler.remove();
@@ -29,11 +103,18 @@ export default function Main() {
     <View style={styles.container}>
       <View style={styles.profileAndButtonsContainer}>
         <View style={styles.profileContainer}>
-          <Image style={styles.profileImage}/>
+          <Image
+            style={styles.profileImage}
+            source={{uri: data.caregiverImgUrl}}
+          />
           <View style={styles.profileTextContainer}>
-            <Text style={styles.profileName}>권혁원 어르신</Text>
-            <Text style={styles.profileDetails}>정진아 요양사(큰 푸른 숲 요양원)</Text>
-            <Text style={styles.profileDetails}>연락처 : 010-xxxx-xxxx</Text>
+            <Text style={styles.profileName}>{data.elderlyName} 어르신</Text>
+            <Text style={styles.profileDetails}>
+              {data.caregiverName} 요양사({data.caregiverOrganization})
+            </Text>
+            <Text style={styles.profileDetails}>
+              연락처 : {data.caregiverContact}
+            </Text>
           </View>
         </View>
 
@@ -41,26 +122,50 @@ export default function Main() {
           <View style={styles.buttonsContainer}>
             <TouchableOpacity
               style={[styles.button, styles.buttonHelp]}
-              onPress={() => setShowHelpButtons(true)}
-            >
+              onPress={() => setShowHelpButtons(true)}>
               <Text style={styles.buttonText}>도와주세요!</Text>
             </TouchableOpacity>
           </View>
         ) : (
           <View style={styles.helpButtonsContainer}>
-            <TouchableOpacity style={[styles.button, styles.additionalButton, styles.buttonPolice]}>
-              <FontAwesome6Icon name="triangle-exclamation" size={50} color="black" />
+            <TouchableOpacity
+              style={[
+                styles.button,
+                styles.additionalButton,
+                styles.buttonPolice,
+              ]}>
+              <FontAwesome6Icon
+                name="triangle-exclamation"
+                size={50}
+                color="black"
+              />
               <Text style={styles.buttonText}>경찰 신고</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={[styles.button, styles.additionalButton, styles.buttonEmergency]}>
+            <TouchableOpacity
+              style={[
+                styles.button,
+                styles.additionalButton,
+                styles.buttonEmergency,
+              ]}>
               <FontAwesome5Icon name="ambulance" size={50} color="black" />
               <Text style={styles.buttonText}>응급 구조</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={[styles.button, styles.additionalButton, styles.buttonAlert]}>
+            <TouchableOpacity
+              style={[
+                styles.button,
+                styles.additionalButton,
+                styles.buttonAlert,
+              ]}
+              onPress={handleCaregiverNotification}>
               <OcticonsIcon name="bell-fill" size={50} color="black" />
               <Text style={styles.buttonText}>요양사 알림</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={[styles.button, styles.additionalButton, styles.buttonCall]}>
+            <TouchableOpacity
+              style={[
+                styles.button,
+                styles.additionalButton,
+                styles.buttonCall,
+              ]}>
               <FontAwesome5Icon name="phone-alt" size={50} color="black" />
               <Text style={styles.buttonText}>요양사 전화</Text>
             </TouchableOpacity>
@@ -71,8 +176,11 @@ export default function Main() {
       <View style={styles.micContainer}>
         <View style={styles.outerBorder}>
           <View style={styles.middleBorder}>
-            <TouchableOpacity style={styles.micButton}>
-              <SimpleLineIcons name="microphone" size={40} color="red" />
+            <TouchableOpacity
+              style={styles.micButton}
+              onPress={handleAccessChat}>
+              {/*<SimpleLineIcons name="microphone" size={40} color="red" />*/}
+              <Text>마이크 아이콘 자리</Text>
             </TouchableOpacity>
           </View>
         </View>
