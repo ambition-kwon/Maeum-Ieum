@@ -8,7 +8,7 @@ import {
   BackHandler,
   Alert,
 } from 'react-native';
-// import SimpleLineIcons from 'react-native-vector-icons/SimpleLine';
+import SimpleLineIcons from 'react-native-vector-icons/SimpleLineIcons';
 import FontAwesome5Icon from 'react-native-vector-icons/FontAwesome5';
 import FontAwesome6Icon from 'react-native-vector-icons/FontAwesome6';
 import OcticonsIcon from 'react-native-vector-icons/Octicons';
@@ -179,8 +179,7 @@ export default function Main() {
             <TouchableOpacity
               style={styles.micButton}
               onPress={handleAccessChat}>
-              {/*<SimpleLineIcons name="microphone" size={40} color="red" />*/}
-              <Text>마이크 아이콘 자리</Text>
+              <SimpleLineIcons name="microphone" size={40} color="red" />
             </TouchableOpacity>
           </View>
         </View>
