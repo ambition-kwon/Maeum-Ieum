@@ -73,11 +73,9 @@ const EditAIScreen = () => {
   const handleAutocomplete = async () => {
     try {
       const response = await caregiver.ruleGenerate(elderlyId, requiredRule);
-      console.log(JSON.stringify(response.data));
-      // setRequiredRule(response.data.data.mandatoryRule);
+      setRequiredRule(response.data.data.mandatoryRule);
     } catch (error) {
       console.log(JSON.stringify(error.response.data, null, 2));
-      // Alert.alert('오류');
     }
   };
 

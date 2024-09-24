@@ -1,36 +1,41 @@
-import React, { useEffect, useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import {
-  View,
-  Text,
-  Image,
-  StyleSheet,
-  TouchableOpacity,
-  ScrollView,
-  TextInput,
   Alert,
   Clipboard,
+  Image,
   Modal,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from 'react-native';
-import { Picker } from '@react-native-picker/picker';
+import {Picker} from '@react-native-picker/picker';
 import DatePicker from 'react-native-date-picker'; // DatePicker 추가
-import { caregiver } from '../../services/controller';
+import {caregiver} from '../../services/controller';
 import FeatherIcon from 'react-native-vector-icons/Feather';
-import { useNavigation, useRoute } from '@react-navigation/native';
-import { launchImageLibrary } from 'react-native-image-picker';
+import {useNavigation, useRoute} from '@react-navigation/native';
+import {launchImageLibrary} from 'react-native-image-picker';
 
 const SeniorDetail = () => {
-  const [selectedDay, setSelectedDay] = useState('수요일마다 받을래요');
   const [isEditing, setIsEditing] = useState(false);
   const [showWeeklyReportsModal, setShowWeeklyReportsModal] = useState(false);
   const [showMonthlyReportsModal, setShowMonthlyReportsModal] = useState(false);
-  const [weeklyReports, setWeeklyReports] = useState(["Weekly Report 1", "Weekly Report 2"]);
-  const [monthlyReports, setMonthlyReports] = useState(["Monthly Report 1", "Monthly Report 2"]);
+  const [weeklyReports, setWeeklyReports] = useState([
+    'Weekly Report 1',
+    'Weekly Report 2',
+  ]);
+  const [monthlyReports, setMonthlyReports] = useState([
+    'Monthly Report 1',
+    'Monthly Report 2',
+  ]);
   const [isDatePickerVisible, setIsDatePickerVisible] = useState(false);
   const [date, setDate] = useState(new Date());
 
   const navigation = useNavigation();
   const route = useRoute();
-  const { elderlyId } = route.params;
+  const {elderlyId} = route.params;
 
   const [profileData, setProfileData] = useState({
     imgUrl: 'https://via.placeholder.com/150',
@@ -50,16 +55,50 @@ const SeniorDetail = () => {
     reportDay: '',
   });
 
+  const handleElderlyDelete = async () => {
+    Alert.alert('경고', '정말 삭제하시겠습니까?', [
+      {
+        text: '취소',
+        onPress: () => console.log('노인 삭제 취소'),
+        style: 'cancel',
+      },
+      {
+        text: '확인',
+        onPress: async () => {
+          try {
+            await caregiver.deleteElderly(elderlyId);
+            navigation.reset({
+              index: 0,
+              routes: [{name: 'ExpertMainScreen'}],
+            });
+          } catch (error) {
+            console.log(error.response.data);
+          }
+        },
+      },
+    ]);
+  };
   useEffect(() => {
     const fetchData = async () => {
       try {
         const response = await caregiver.infoElderly(elderlyId);
+        console.log(JSON.stringify(response.data.data, null, 2));
+        const formatBirthDate = dateString => {
+          const regex = /(\d{4})년 (\d{2})월 (\d{2})일/;
+          const match = dateString.match(regex);
+          if (match) {
+            const [_, year, month, day] = match;
+            return `${year}-${month}-${day}`;
+          }
+          return dateString;
+        };
         setProfileData({
-          imgUrl: response.data.data.imgUrl || 'https://via.placeholder.com/150',
+          imgUrl:
+            response.data.data.imgUrl || 'https://via.placeholder.com/150',
           uid: response.data.data.accessCode || '',
           name: response.data.data.name || '',
           gender: response.data.data.gender || '',
-          birthDate: response.data.data.birthDate || '',
+          birthDate: formatBirthDate(response.data.data.birthDate || ''), // 생년월일 변환
           homeAddress: response.data.data.homeAddress || '',
           organization: response.data.data.organization || '',
           contact: response.data.data.contact || '',
@@ -95,8 +134,9 @@ const SeniorDetail = () => {
           assistantName: profileData.assistantName,
         };
         await caregiver.editElderly(elderlyId, data);
+        Alert.alert('알림', '수정된 정보가 성공적으로 반영되었습니다.');
       } catch (error) {
-        Alert.alert('오류', JSON.stringify(error.response.data.data, null, 2));
+        Alert.alert('오류', '필수 입력 정보를 모두 채웠는지 확인해주세요.');
         console.log(error.response.data);
       } finally {
         setIsEditing(prev => !prev);
@@ -113,13 +153,26 @@ const SeniorDetail = () => {
     }));
   };
 
+  const handleReportDay = async date => {
+    if (date !== '') {
+      try {
+        await caregiver.editReportDay(elderlyId, date);
+        Alert.alert('알림', '보고서 발행 일자가 성공적으로 변경되었습니다.');
+      } catch (error) {
+        console.log(JSON.stringify(error.response.data, null, 2));
+      }
+    } else {
+      Alert.alert('오류', '보고서 발행 일자를 지정해주세요');
+    }
+  };
+
   // 생년월일 수정 시 DatePicker를 표시하는 함수
   const showDatePicker = () => {
     setIsDatePickerVisible(true);
   };
 
   // DatePicker에서 날짜 선택 시 실행되는 함수
-  const handleDateConfirm = (selectedDate) => {
+  const handleDateConfirm = selectedDate => {
     setIsDatePickerVisible(false);
     setDate(selectedDate);
     const formattedDate = selectedDate.toISOString().split('T')[0]; // YYYY-MM-DD 포맷으로 변환
@@ -130,6 +183,16 @@ const SeniorDetail = () => {
     setIsDatePickerVisible(false);
   };
 
+  const handlePatchImage = async updatedImage => {
+    try {
+      const formData = new FormData();
+      formData.append('img', updatedImage);
+      await caregiver.editElderlyImage(elderlyId, formData);
+    } catch (error) {
+      console.log(JSON.stringify(error.response.data, null, 2));
+    }
+  };
+
   const handleProfilePress = () => {
     const options = {
       mediaType: 'photo',
@@ -138,17 +201,37 @@ const SeniorDetail = () => {
       maxHeight: 300,
     };
 
-    launchImageLibrary(options, (response) => {
+    launchImageLibrary(options, response => {
       if (response.didCancel) {
         console.log('User cancelled image picker');
       } else if (response.errorMessage) {
         console.log('ImagePicker Error: ', response.errorMessage);
       } else if (response.assets && response.assets.length > 0) {
-        const selectedImageUri = response.assets[0].uri; // Get the selected image's URI
-        setProfileData(prevData => ({
-          ...prevData,
-          imgUrl: selectedImageUri, // Update the imgUrl in the profileData state
-        }));
+        try {
+          setProfileData(prevData => ({
+            ...prevData,
+            imgUrl: response.assets[0].uri,
+          }));
+          // 서버 이미지 변경 API
+          const image = {
+            uri: response.assets[0].uri,
+            type: response.assets[0].type,
+            name: `image_${Date.now()}`,
+          };
+          handlePatchImage(image)
+            .then(() => {
+              Alert.alert('알림', '이미지를 성공적으로 변경하였습니다.');
+              navigation.reset({
+                index: 0,
+                routes: [{name: 'ExpertMainScreen'}],
+              });
+            })
+            .catch(error => {
+              console.log(JSON.stringify(error.response.data, null, 2));
+            });
+        } catch (error) {
+          console.log(JSON.stringify(error.response.data, null, 2));
+        }
       }
     });
   };
@@ -182,17 +265,18 @@ const SeniorDetail = () => {
           <TouchableOpacity
             style={styles.profileImageButton}
             onPress={handleProfilePress}
-            disabled={!isEditing}
-          >
+            disabled={!isEditing}>
             <Image
-              source={{ uri: profileData.imgUrl }}
+              source={{uri: profileData.imgUrl}}
               style={styles.profileImage}
             />
           </TouchableOpacity>
           <Text style={styles.profileName}>{profileData.name} 어르신</Text>
           <View style={styles.uidContainer}>
             <Text style={styles.profileUID}>uid: {profileData.uid}</Text>
-            <TouchableOpacity style={styles.copyButton} onPress={copyToClipboard}>
+            <TouchableOpacity
+              style={styles.copyButton}
+              onPress={copyToClipboard}>
               <FeatherIcon name="copy" size={16} color="black" />
             </TouchableOpacity>
           </View>
@@ -243,7 +327,9 @@ const SeniorDetail = () => {
         <View style={styles.infoRow}>
           <Text style={styles.infoLabel}>생년월일</Text>
           {isEditing ? (
-            <TouchableOpacity onPress={showDatePicker} style={styles.datePickerButton}>
+            <TouchableOpacity
+              onPress={showDatePicker}
+              style={styles.datePickerButton}>
               <Text>{profileData.birthDate || 'YYYY-MM-DD'}</Text>
             </TouchableOpacity>
           ) : (
@@ -329,7 +415,9 @@ const SeniorDetail = () => {
               onChangeText={text => handleChange('emergencyContactName', text)}
             />
           ) : (
-            <Text style={styles.infoValue}>{profileData.emergencyContactName}</Text>
+            <Text style={styles.infoValue}>
+              {profileData.emergencyContactName}
+            </Text>
           )}
         </View>
         <View style={styles.infoRow}>
@@ -341,7 +429,9 @@ const SeniorDetail = () => {
               onChangeText={text => handleChange('emergencyContactPhone', text)}
             />
           ) : (
-            <Text style={styles.infoValue}>{profileData.emergencyContactPhone}</Text>
+            <Text style={styles.infoValue}>
+              {profileData.emergencyContactPhone}
+            </Text>
           )}
         </View>
         <View style={styles.infoRow}>
@@ -350,10 +440,14 @@ const SeniorDetail = () => {
             <TextInput
               style={styles.input}
               value={profileData.emergencyContactRelation}
-              onChangeText={text => handleChange('emergencyContactRelation', text)}
+              onChangeText={text =>
+                handleChange('emergencyContactRelation', text)
+              }
             />
           ) : (
-            <Text style={styles.infoValue}>{profileData.emergencyContactRelation}</Text>
+            <Text style={styles.infoValue}>
+              {profileData.emergencyContactRelation}
+            </Text>
           )}
         </View>
       </View>
@@ -362,56 +456,48 @@ const SeniorDetail = () => {
         <Text style={styles.sectionTitle}>주간 보고서</Text>
         <View style={styles.customPickerContainer}>
           <Picker
-            selectedValue={selectedDay}
+            selectedValue={profileData.reportDay}
             style={styles.customPicker}
-            onValueChange={itemValue => setSelectedDay(itemValue)}
-            enabled={isEditing}
-          >
-            <Picker.Item
-              label="월요일마다 받을래요"
-              value="월요일마다 받을래요"
-            />
-            <Picker.Item
-              label="화요일마다 받을래요"
-              value="화요일마다 받을래요"
-            />
-            <Picker.Item
-              label="수요일마다 받을래요"
-              value="수요일마다 받을래요"
-            />
-            <Picker.Item
-              label="목요일마다 받을래요"
-              value="목요일마다 받을래요"
-            />
-            <Picker.Item
-              label="금요일마다 받을래요"
-              value="금요일마다 받을래요"
-            />
-            <Picker.Item
-              label="토요일마다 받을래요"
-              value="토요일마다 받을래요"
-            />
-            <Picker.Item
-              label="일요일마다 받을래요"
-              value="일요일마다 받을래요"
-            />
+            onValueChange={itemValue => {
+              setProfileData(prevProfileData => ({
+                ...prevProfileData,
+                reportDay: itemValue,
+              }));
+              // 서버 API 전송
+              handleReportDay(itemValue);
+            }}
+            enabled={isEditing}>
+            <Picker.Item label="보고서 발행 일자를 선택해주세요" value="" />
+            <Picker.Item label="월요일마다 받을래요" value="MONDAY" />
+            <Picker.Item label="화요일마다 받을래요" value="TUESDAY" />
+            <Picker.Item label="수요일마다 받을래요" value="WEDNESDAY" />
+            <Picker.Item label="목요일마다 받을래요" value="THURSDAY" />
+            <Picker.Item label="금요일마다 받을래요" value="FRIDAY" />
+            <Picker.Item label="토요일마다 받을래요" value="SATURDAY" />
+            <Picker.Item label="일요일마다 받을래요" value="SUNDAY" />
           </Picker>
         </View>
-        <TouchableOpacity style={styles.customButton} onPress={handleWeeklyReportPress}>
+        <TouchableOpacity
+          style={styles.customButton}
+          onPress={handleWeeklyReportPress}>
           <Text style={styles.customButtonText}>주간 보고서 확인</Text>
         </TouchableOpacity>
       </View>
 
       <View style={styles.reportSection}>
         <Text style={styles.sectionTitle}>월간 보고서</Text>
-        <TouchableOpacity style={styles.customButton} onPress={handleMonthlyReportPress}>
+        <TouchableOpacity
+          style={styles.customButton}
+          onPress={handleMonthlyReportPress}>
           <Text style={styles.customButtonText}>월간 보고서 확인</Text>
         </TouchableOpacity>
       </View>
 
       {/* 삭제하기 버튼 */}
       <View style={styles.deleteButtonContainer}>
-        <TouchableOpacity style={styles.deleteButton}>
+        <TouchableOpacity
+          style={styles.deleteButton}
+          onPress={handleElderlyDelete}>
           <Text style={styles.deleteButtonText}>삭제하기</Text>
         </TouchableOpacity>
       </View>
@@ -427,8 +513,7 @@ const SeniorDetail = () => {
           ))}
           <TouchableOpacity
             style={styles.closeButton}
-            onPress={() => setShowWeeklyReportsModal(false)}
-          >
+            onPress={() => setShowWeeklyReportsModal(false)}>
             <Text style={styles.closeButtonText}>닫기</Text>
           </TouchableOpacity>
         </View>
@@ -445,8 +530,7 @@ const SeniorDetail = () => {
           ))}
           <TouchableOpacity
             style={styles.closeButton}
-            onPress={() => setShowMonthlyReportsModal(false)}
-          >
+            onPress={() => setShowMonthlyReportsModal(false)}>
             <Text style={styles.closeButtonText}>닫기</Text>
           </TouchableOpacity>
         </View>
