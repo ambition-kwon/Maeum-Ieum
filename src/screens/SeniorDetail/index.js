@@ -12,6 +12,7 @@ import {
   Modal,
 } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
+import DatePicker from 'react-native-date-picker'; // DatePicker 추가
 import { caregiver } from '../../services/controller';
 import FeatherIcon from 'react-native-vector-icons/Feather';
 import { useNavigation, useRoute } from '@react-navigation/native';
@@ -22,8 +23,10 @@ const SeniorDetail = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [showWeeklyReportsModal, setShowWeeklyReportsModal] = useState(false);
   const [showMonthlyReportsModal, setShowMonthlyReportsModal] = useState(false);
-  const [weeklyReports, setWeeklyReports] = useState(["Weekly Report 1", "Weekly Report 2"]);   // 임시로 넣어둔 주간 보고서 데이터
-  const [monthlyReports, setMonthlyReports] = useState(["Monthly Report 1", "Monthly Report 2"]);   // 임시로 넣어둔 월간 보고서 데이터
+  const [weeklyReports, setWeeklyReports] = useState(["Weekly Report 1", "Weekly Report 2"]);
+  const [monthlyReports, setMonthlyReports] = useState(["Monthly Report 1", "Monthly Report 2"]);
+  const [isDatePickerVisible, setIsDatePickerVisible] = useState(false);
+  const [date, setDate] = useState(new Date());
 
   const navigation = useNavigation();
   const route = useRoute();
@@ -110,6 +113,23 @@ const SeniorDetail = () => {
     }));
   };
 
+  // 생년월일 수정 시 DatePicker를 표시하는 함수
+  const showDatePicker = () => {
+    setIsDatePickerVisible(true);
+  };
+
+  // DatePicker에서 날짜 선택 시 실행되는 함수
+  const handleDateConfirm = (selectedDate) => {
+    setIsDatePickerVisible(false);
+    setDate(selectedDate);
+    const formattedDate = selectedDate.toISOString().split('T')[0]; // YYYY-MM-DD 포맷으로 변환
+    handleChange('birthDate', formattedDate);
+  };
+
+  const handleCancel = () => {
+    setIsDatePickerVisible(false);
+  };
+
   const handleProfilePress = () => {
     const options = {
       mediaType: 'photo',
@@ -123,25 +143,18 @@ const SeniorDetail = () => {
         console.log('User cancelled image picker');
       } else if (response.errorMessage) {
         console.log('ImagePicker Error: ', response.errorMessage);
+      } else if (response.assets && response.assets.length > 0) {
+        const selectedImageUri = response.assets[0].uri; // Get the selected image's URI
+        setProfileData(prevData => ({
+          ...prevData,
+          imgUrl: selectedImageUri, // Update the imgUrl in the profileData state
+        }));
       }
-      // 이미지 업로드 API 호출 코드 추가
     });
   };
 
   const handleBackPress = () => {
     navigation.goBack();
-  };
-
-  const handleDateChange = text => {
-    const formattedDate = text.replace(/[^0-9-]/g, '');
-    const maxLength = 10;
-
-    if (formattedDate.length <= maxLength) {
-      setProfileData(prevState => ({
-        ...prevState,
-        birthDate: formattedDate,
-      }));
-    }
   };
 
   const copyToClipboard = () => {
@@ -216,7 +229,7 @@ const SeniorDetail = () => {
               onValueChange={value => handleChange('gender', value)}>
               <Picker.Item
                 label="성별을 선택해주세요"
-                value={`${profileData.gender}`}
+                value={profileData.gender}
               />
               <Picker.Item label="남자" value="MALE" />
               <Picker.Item label="여자" value="FEMALE" />
@@ -225,21 +238,35 @@ const SeniorDetail = () => {
             <Text style={styles.infoValue}>{profileData.gender}</Text>
           )}
         </View>
+
+        {/* 생년월일 필드 */}
         <View style={styles.infoRow}>
           <Text style={styles.infoLabel}>생년월일</Text>
           {isEditing ? (
-            <TextInput
-              style={styles.input}
-              value={profileData.birthDate}
-              placeholder="YYYY-MM-DD"
-              onChangeText={handleDateChange}
-              keyboardType="numeric"
-              maxLength={10}
-            />
+            <TouchableOpacity onPress={showDatePicker} style={styles.datePickerButton}>
+              <Text>{profileData.birthDate || 'YYYY-MM-DD'}</Text>
+            </TouchableOpacity>
           ) : (
             <Text style={styles.infoValue}>{profileData.birthDate}</Text>
           )}
         </View>
+
+        {/* DatePicker 모달 */}
+        <DatePicker
+          modal
+          mode="date"
+          open={isDatePickerVisible}
+          date={date}
+          onConfirm={handleDateConfirm}
+          onCancel={handleCancel}
+          minimumDate={new Date(1900, 0, 1)}
+          maximumDate={new Date()}
+          locale="ko"
+          title="날짜 선택"
+          confirmText="확인"
+          cancelText="취소"
+        />
+
         <View style={styles.infoRow}>
           <Text style={styles.infoLabel}>주거지</Text>
           {isEditing ? (
@@ -379,6 +406,13 @@ const SeniorDetail = () => {
         <Text style={styles.sectionTitle}>월간 보고서</Text>
         <TouchableOpacity style={styles.customButton} onPress={handleMonthlyReportPress}>
           <Text style={styles.customButtonText}>월간 보고서 확인</Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* 삭제하기 버튼 */}
+      <View style={styles.deleteButtonContainer}>
+        <TouchableOpacity style={styles.deleteButton}>
+          <Text style={styles.deleteButtonText}>삭제하기</Text>
         </TouchableOpacity>
       </View>
 
@@ -576,6 +610,22 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   closeButtonText: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  deleteButtonContainer: {
+    paddingHorizontal: 20,
+    paddingBottom: 40,
+    marginTop: 20,
+  },
+  deleteButton: {
+    backgroundColor: '#FF5A5F',
+    borderRadius: 10,
+    paddingVertical: 15,
+    alignItems: 'center',
+  },
+  deleteButtonText: {
     color: '#fff',
     fontSize: 18,
     fontWeight: 'bold',
