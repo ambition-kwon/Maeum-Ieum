@@ -1,12 +1,13 @@
-// 나중에 기능 추가하면서 넣어야 하는 기능
-// 정량적 분석 상태 입력 받으면 매우 나쁨, 좋음 등의 상태 글자 색깔 같이 바뀌게 추가할 것
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, TextInput, Image, ScrollView, Dimensions } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, TextInput, ScrollView, Dimensions } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 const WeeklyReport = () => {
   const [selectedTab, setSelectedTab] = useState('quantitative'); // 기본적으로 '정량적 분석' 선택
   const [currentIndex, setCurrentIndex] = useState(0); // 슬라이드 인덱스 관리
+  const [isMemoVisible, setIsMemoVisible] = useState(false); // 메모 입력 필드 표시 여부
+  const [memoText, setMemoText] = useState(''); // 메모 입력 필드 내용
+  const [savedMemo, setSavedMemo] = useState(''); // 저장된 메모
 
   // 나중에 여기 icon에 대한 것을 backend에서 받아와서 그에 맞는 아이콘으로 변경해야 함
   const indicators = [
@@ -61,7 +62,6 @@ const WeeklyReport = () => {
 
   const renderContent = () => {
     if (selectedTab === 'quantitative') {
-      // 정량적 분석 내용 렌더링
       const { title, description, icon } = indicators[currentIndex];
 
       return (
@@ -84,7 +84,6 @@ const WeeklyReport = () => {
         </View>
       );
     } else if (selectedTab === 'qualitative') {
-      // 정성적 분석 내용 렌더링
       return (
         <View style={styles.analysisContainer}>
           <Text style={styles.analysisTitle}>정성적 분석 결과</Text>
@@ -96,6 +95,18 @@ const WeeklyReport = () => {
         </View>
       );
     }
+  };
+
+  // 메모 저장 함수
+  const handleSaveMemo = () => {
+    setSavedMemo(memoText); // 입력된 메모 저장
+    setIsMemoVisible(false); // 메모 입력 필드 숨김
+  };
+
+  // 메모 수정 버튼을 누르면 입력 필드 표시
+  const handleMemoEdit = () => {
+    setMemoText(savedMemo); // 기존 메모를 입력 필드로 가져오기
+    setIsMemoVisible(true); // 메모 입력 필드 다시 표시
   };
 
   return (
@@ -127,18 +138,39 @@ const WeeklyReport = () => {
       </View>
 
       <ScrollView contentContainerStyle={styles.scrollContainer}>
-        {/* 위에서 정의한 renderContent 함수를 호출하여 선택된 탭에 따라 다른 내용을 표시 */}
         {renderContent()}
 
-        {/* 메모의 경우 정량적 분석, 정성적 분석 모두 결국 <주간 보고서>라는 큰 틀에 대한 메모를 적는다고 생각하여 탭을 넘기더라도 내용은 유지되도록 구현해놨음 */}
-        {/* 추후 필요에 따라 정량적 분석과 정성적 분석의 메모를 따로 구현 가능 */}
         <View style={styles.memoContainer}>
           <Text style={styles.memoLabel}>메모</Text>
-          <TextInput
-            style={styles.memoInput}
-            placeholder="내용을 입력해주세요"
-            placeholderTextColor="#c4c4c4"
-          />
+          {isMemoVisible ? (
+            <>
+              <TextInput
+                style={styles.memoInput}
+                value={memoText}
+                onChangeText={setMemoText}
+                placeholder="내용을 입력해주세요"
+                placeholderTextColor="#c4c4c4"
+              />
+              <TouchableOpacity style={styles.saveMemoButton} onPress={handleSaveMemo}>
+                <Text style={styles.saveMemoButtonText}>메모 저장</Text>
+              </TouchableOpacity>
+            </>
+          ) : (
+            <>
+              {savedMemo ? (
+                <>
+                  <Text style={styles.savedMemo}>{savedMemo}</Text>
+                  <TouchableOpacity style={styles.memoButton} onPress={handleMemoEdit}>
+                    <Text style={styles.memoButtonText}>메모 수정</Text>
+                  </TouchableOpacity>
+                </>
+              ) : (
+                <TouchableOpacity style={styles.memoButton} onPress={() => setIsMemoVisible(true)}>
+                  <Text style={styles.memoButtonText}>메모 작성</Text>
+                </TouchableOpacity>
+              )}
+            </>
+          )}
         </View>
       </ScrollView>
     </View>
@@ -238,11 +270,6 @@ const styles = StyleSheet.create({
   resultIconContainer: {
     marginBottom: 10,
   },
-  resultIcon: {
-    width: 70,
-    height: 70,
-    resizeMode: 'contain',
-  },
   resultStatus: {
     fontSize: 24,
     fontWeight: 'bold',
@@ -261,6 +288,7 @@ const styles = StyleSheet.create({
   },
   memoContainer: {
     padding: 20,
+
   },
   memoLabel: {
     fontSize: 20,
@@ -275,6 +303,36 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
     color: '#000',
+    marginBottom: 10,
+  },
+  memoButton: {
+    backgroundColor: '#FCCB02',
+    padding: 10,
+    borderRadius: 10,
+    alignItems: 'center',
+  },
+  memoButtonText: {
+    fontSize: 18,
+    color: '#fff',
+    fontWeight: 'bold',
+  },
+  saveMemoButton: {
+    backgroundColor: '#000',
+    padding: 10,
+    borderRadius: 10,
+    alignItems: 'center',
+    marginTop: 10,
+  },
+  saveMemoButtonText: {
+    fontSize: 18,
+    color: '#fff',
+    fontWeight: 'bold',
+  },
+  savedMemo: {
+    fontSize: 18,
+    color: '#000',
+    fontWeight: 'bold',
+    marginBottom: 20,
   },
   navButtonText: {
     fontSize: 24,

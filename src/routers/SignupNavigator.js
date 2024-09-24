@@ -28,6 +28,8 @@ import EditAIScreen from '../screens/EditAIScreen';
 import SeniorDetail from '../screens/SeniorDetail';
 import Main from '../screens/Main/Main';
 import Chat from '../screens/Chat/Chat';
+import WeeklyReport from '../screens/WeeklyReport';
+import MonthlyReport from '../screens/MonthlyReport';
 
 const Stack = createStackNavigator();
 
@@ -168,6 +170,16 @@ export default function SignupNavigator() {
         <Stack.Screen
           name="SeniorChatScreen"
           component={Chat}
+          options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name="WeeklyReportScreen"
+          component={WeeklyReport}
+          options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name="MonthlyReportScreen"
+          component={MonthlyReport}
           options={{headerShown: false}}
         />
       </Stack.Navigator>
