@@ -101,8 +101,15 @@ const EditInfo = () => {
         console.log('User cancelled image picker');
       } else if (response.errorMessage) {
         console.log('ImagePicker Error: ', response.errorMessage);
+      } else if (response.assets && response.assets.length > 0) {
+        const selectedImageUri = response.assets[0].uri;
+        // 이미지 URI를 data 상태에 업데이트
+        setData(prevData => ({
+          ...prevData,
+          imgUrl: selectedImageUri,
+        }));
+        // 여기에서 서버로 이미지를 업로드하는 API 호출을 추가할 수 있음
       }
-      // 이미지 업로드 API 호출 코드 추가
     });
   };
 
