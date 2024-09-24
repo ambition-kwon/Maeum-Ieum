@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   View,
   Text,
@@ -11,14 +11,21 @@ import {
 } from 'react-native';
 import DatePicker from 'react-native-date-picker';
 import FontAwesome5Icon from 'react-native-vector-icons/FontAwesome5';
-import { caregiver } from '../../services/controller';
-import { useNavigation } from '@react-navigation/native';
+import {caregiver} from '../../services/controller';
+import {useNavigation} from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { launchImageLibrary } from 'react-native-image-picker';
+import {launchImageLibrary} from 'react-native-image-picker';
 
 const EditInfo = () => {
   const navigation = useNavigation();
-  const [data, setData] = useState({});
+  const [data, setData] = useState({
+    name: '',
+    imgUrl: 'https://via.placeholder.com/50',
+    gender: '',
+    birthDate: '',
+    organization: '',
+    contact: '',
+  });
   const [isEditing, setIsEditing] = useState(false); // 모달 상태 관리
   const [currentField, setCurrentField] = useState(''); // 수정 중인 필드
   const [newValue, setNewValue] = useState(''); // 입력된 값
@@ -39,24 +46,44 @@ const EditInfo = () => {
             await AsyncStorage.removeItem('token');
             navigation.reset({
               index: 0,
-              routes: [{ name: 'Login' }],
+              routes: [{name: 'Login'}],
             });
           } catch (error) {
-            console.log(error.message);
+            console.log(error.response.data);
           }
         },
       },
     ]);
   };
 
+  const handlePatch = async () => {
+    try {
+      const response = await caregiver.editMypage(data);
+      console.log(JSON.stringify(response.data.data, null, 2));
+    } catch (error) {
+      console.log(JSON.stringify(error.response.data, null, 2));
+    }
+  };
+
+  const convertBirthDate = dateString => {
+    const year = dateString.substring(0, 4);
+    const month = dateString.substring(6, 8);
+    const day = dateString.substring(10, 12);
+    return `${year}-${month}-${day}`;
+  };
+
   useEffect(() => {
     caregiver
       .mypage()
-      .then((response) => {
-        console.log(JSON.stringify(response.data.data, null, 2));
-        setData(response.data.data);
+      .then(response => {
+        const fetchedData = response.data.data;
+        const formattedBirthDate = convertBirthDate(fetchedData.birthDate);
+        setData({
+          ...fetchedData,
+          birthDate: formattedBirthDate,
+        });
       })
-      .catch((error) => {
+      .catch(error => {
         console.log(error.response.data);
       });
   }, []);
@@ -69,7 +96,7 @@ const EditInfo = () => {
       maxHeight: 300,
     };
 
-    launchImageLibrary(options, (response) => {
+    launchImageLibrary(options, response => {
       if (response.didCancel) {
         console.log('User cancelled image picker');
       } else if (response.errorMessage) {
@@ -79,7 +106,7 @@ const EditInfo = () => {
     });
   };
 
-  const handleEditField = (field) => {
+  const handleEditField = field => {
     if (field === 'birthDate') {
       setDatePickerVisibility(true); // 생년월일 필드 수정 시 DatePicker 열기
     } else {
@@ -89,21 +116,37 @@ const EditInfo = () => {
     }
   };
 
-  const handleDateConfirm = (date) => {
-    const formattedDate = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
-    setData((prevData) => ({
+  const handleDateConfirm = date => {
+    const formattedDate = `${date.getFullYear()}-${String(
+      date.getMonth() + 1,
+    ).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+    setData(prevData => ({
       ...prevData,
       birthDate: formattedDate, // 생년월일 필드를 수정된 값으로 설정
     }));
-    setDatePickerVisibility(false); // DatePicker 닫기
+    handlePatch()
+      .then(() => {
+        setDatePickerVisibility(false); // DatePicker 닫기
+      })
+      .catch(error => {
+        setDatePickerVisibility(false); // DatePicker 닫기
+        console.log(JSON.stringify(error.response.data, null, 2));
+      });
   };
 
   const saveNewValue = () => {
-    setData((prevData) => ({
+    setData(prevData => ({
       ...prevData,
       [currentField]: newValue, // 수정된 값을 저장
     }));
-    setIsEditing(false); // 모달 닫기
+    handlePatch()
+      .then(() => {
+        setIsEditing(false); // 모달 닫기
+      })
+      .catch(error => {
+        console.log(JSON.stringify(error.response.data, null, 2));
+        setIsEditing(false); // 모달 닫기
+      });
   };
 
   return (
@@ -113,7 +156,10 @@ const EditInfo = () => {
         <TouchableOpacity
           style={styles.backButton}
           onPress={() => {
-            navigation.goBack();
+            navigation.reset({
+              index: 0,
+              routes: [{name: 'ExpertMainScreen'}],
+            });
           }}>
           <Text style={styles.backButtonText}>{'<'}</Text>
         </TouchableOpacity>
@@ -122,7 +168,7 @@ const EditInfo = () => {
 
       <View style={styles.profileSection}>
         <TouchableOpacity onPress={handleProfilePress}>
-          <Image source={{ uri: data.imgUrl }} style={styles.profileImage} />
+          <Image source={{uri: data.imgUrl}} style={styles.profileImage} />
         </TouchableOpacity>
         <Text style={styles.profileName}>{data.name} 요양사</Text>
       </View>
@@ -183,9 +229,7 @@ const EditInfo = () => {
         </View>
       </View>
 
-      <TouchableOpacity
-        style={styles.logoutButton}
-        onPress={handleLogout}>
+      <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
         <Text style={styles.logoutText}>로그아웃</Text>
       </TouchableOpacity>
 
@@ -202,7 +246,9 @@ const EditInfo = () => {
             <TouchableOpacity style={styles.saveButton} onPress={saveNewValue}>
               <Text style={styles.saveButtonText}>저장</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.cancelButton} onPress={() => setIsEditing(false)}>
+            <TouchableOpacity
+              style={styles.cancelButton}
+              onPress={() => setIsEditing(false)}>
               <Text style={styles.cancelButtonText}>취소</Text>
             </TouchableOpacity>
           </View>
@@ -316,7 +362,7 @@ const styles = StyleSheet.create({
     marginTop: 70,
     marginHorizontal: 30,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: {width: 0, height: 2},
     shadowOpacity: 0.2,
     shadowRadius: 5,
     elevation: 5,
