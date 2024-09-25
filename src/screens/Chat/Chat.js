@@ -1,116 +1,168 @@
-import React, {useState, useRef, useEffect} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  Image,
+  Alert,
   Animated,
   Easing,
+  Keyboard,
   ScrollView,
+  StyleSheet,
+  Text,
   TextInput,
-} from 'react-native'; // TextInput 추가
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import SimpleLineIcons from 'react-native-vector-icons/SimpleLineIcons';
 import IoniconsIcon from 'react-native-vector-icons/Ionicons';
 import FeatherIcon from 'react-native-vector-icons/Feather';
 import {elderly} from '../../services/controller';
-import {useRoute} from '@react-navigation/native';
-
-const dummyData = [
-  '오늘은 담당 요양사가 방문하는 날입니다! 오늘은 담당 요양사가 방문하는 날입니다! 오늘은 담당 요양사가 방문하는 날입니다! 오늘은 담당 요양사가 방문하는 날입니다!',
-];
+import {useNavigation, useRoute} from '@react-navigation/native';
+import Voice from '@react-native-voice/voice';
+import Sound from 'react-native-sound';
+import RNFS from 'react-native-fs';
 
 export default function Chat() {
   const [isRecording, setIsRecording] = useState(false);
-  const [selectedGender, setSelectedGender] = useState('male'); // 기본 값은 male로 설정해뒀음
+  const [selectedGender, setSelectedGender] = useState('MALE');
   const spinValue = useRef(new Animated.Value(0)).current;
   const [requestText, setRequestText] = useState('');
+  const [viewRequestText, setViewRequestText] = useState('');
+  const [responseText, setResponseText] = useState('');
+  const navigation = useNavigation();
   const route = useRoute();
   const {threadId, openAiAssistantId, elderlyId} = route.params;
-  const [streamResponse, setStreamResponse] = useState(''); // 실시간 응답 상태
-  const [isLoading, setIsLoading] = useState(false); // 로딩 상태
-  const [error, setError] = useState(null); // 오류 상태
-  const [finalTimestamp, setFinalTimestamp] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isListening, setIsListening] = useState(false);
 
-  const handleMicPress = () => {
-    setIsRecording(prevState => !prevState);
+  const playAudio = async audioData => {
+    const filePath = `${RNFS.DocumentDirectoryPath}/audio.mp3`;
+    try {
+      await RNFS.writeFile(filePath, audioData, 'base64');
+      const sound = new Sound(filePath, Sound.MAIN_BUNDLE, error => {
+        if (error) {
+          console.log('Failed to load sound', error);
+          return;
+        }
+        sound.play(success => {
+          if (success) {
+            console.log('Successfully finished playing');
+            RNFS.unlink(filePath)
+              .then(() => {
+                console.log('File deleted:', filePath);
+              })
+              .catch(error => {
+                console.log('Error deleting file:', error);
+              });
+          } else {
+            console.log('Playback failed due to audio decoding errors');
+          }
+        });
+      });
+    } catch (error) {
+      console.error('Error writing audio file:', error);
+    }
   };
 
-  const handleSend = async () => {
+  const handleBackPress = () => {
+    navigation.goBack();
+  };
+
+  const handleTextSend = async () => {
     try {
+      setIsLoading(true);
       const data = {
         content: requestText,
         openAiAssistantId: openAiAssistantId,
         threadId: threadId,
       };
-      const response = await elderly.getStreamText(elderlyId, data);
-      console.log(response.data);
+      Keyboard.dismiss();
+      setRequestText('');
+      setResponseText('');
+      setViewRequestText(requestText);
+      const response = await elderly.getNonStreamText(elderlyId, data);
+      setResponseText(response.data.data.answer);
+      setIsLoading(false);
     } catch (error) {
+      Alert.alert(
+        '오류',
+        '서버 오류로 인해 이음이와 대화가 이루어지지 않았어요.',
+      );
+      console.log(JSON.stringify(error.response.data, null, 2));
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    const handleSpeechResults = result => {
+      onSpeechResults(result, selectedGender);
+    };
+
+    Voice.onSpeechStart = onSpeechStart;
+    Voice.onSpeechResults = handleSpeechResults;
+    Voice.onSpeechError = onSpeechError;
+
+    return () => {
+      Voice.destroy().then(Voice.removeAllListeners);
+    };
+  }, [selectedGender]);
+
+  const onSpeechStart = () => {
+    setRequestText('');
+    setViewRequestText('');
+    setResponseText('');
+    setIsRecording(true);
+    setIsListening(true);
+    setIsLoading(true);
+    Keyboard.dismiss();
+  };
+
+  const onSpeechResults = async (result, currentGender) => {
+    setViewRequestText(result.value[0]);
+    setIsListening(false);
+    setIsRecording(false);
+    setIsLoading(false);
+    try {
+      const response = await elderly.getVoice(elderlyId, {
+        content: result.value[0],
+        openAiAssistantId: openAiAssistantId,
+        threadId: threadId,
+        gender: currentGender,
+      });
+      setResponseText(response.data.data.content);
+      await playAudio(response.data.data.answer);
+    } catch (error) {
+      Alert.alert(
+        '오류',
+        '서버 오류로 인해 이음이와 대화가 이루어지지 않았어요.',
+      );
       console.log(JSON.stringify(error.response.data, null, 2));
     }
   };
-  // const handleSend = async () => {
-  //   setStreamResponse(''); // 이전 응답 초기화
-  //   setError(null); // 오류 초기화
-  //   setIsLoading(true); // 로딩 시작
-  //
-  //   const data = {
-  //     content: requestText,
-  //     openAiAssistantId: openAiAssistantId,
-  //     threadId: threadId,
-  //   };
-  //
-  //   try {
-  //     const response = await fetch(
-  //       `https://port-0-maeum-ieum-test-m0nh6gqqc01cecdf.sel4.cloudtype.app/elderlys/${elderlyId}/stream-message`,
-  //       {
-  //         method: 'POST',
-  //         headers: {
-  //           'Content-Type': 'application/json',
-  //         },
-  //         body: JSON.stringify(data),
-  //       },
-  //     );
-  //
-  //     if (!response.ok) {
-  //       throw new Error('Network response was not ok');
-  //     }
-  //
-  //     // 스트림 처리
-  //     const reader = response.body.getReader();
-  //     const decoder = new TextDecoder('utf-8');
-  //     let isLast = false;
-  //
-  //     while (!isLast) {
-  //       const {value, done} = await reader.read(); // 스트림에서 데이터 읽기
-  //       const chunk = decoder.decode(value, {stream: true});
-  //
-  //       if (chunk) {
-  //         const parsedChunk = JSON.parse(chunk); // JSON으로 변환
-  //
-  //         parsedChunk.forEach(item => {
-  //           if (item.answer !== null) {
-  //             setStreamResponse(prev => prev + item.answer); // 실시간 응답 추가
-  //           }
-  //           if (item.isLast) {
-  //             isLast = true; // 마지막 데이터 처리
-  //             setFinalTimestamp(item.timeStamp);
-  //           }
-  //         });
-  //       }
-  //
-  //       if (done) {
-  //         break; // 스트림이 끝나면 루프 종료
-  //       }
-  //     }
-  //
-  //     setIsLoading(false); // 로딩 완료
-  //   } catch (err) {
-  //     setError('Error fetching stream data');
-  //     console.error('Error:', err);
-  //     setIsLoading(false); // 로딩 완료
-  //   }
-  // };
+
+  const onSpeechError = error => {
+    console.error(error);
+    setIsListening(false);
+    setIsRecording(false);
+    setIsLoading(false);
+  };
+
+  const startListening = async () => {
+    try {
+      setIsListening(true);
+      await Voice.start('ko-KR');
+    } catch (error) {
+      setIsRecording(false);
+      console.error(error);
+    }
+  };
+
+  const stopListening = async () => {
+    try {
+      await Voice.stop();
+      setIsRecording(false);
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   useEffect(() => {
     // 로딩 스피너의 회전 애니메이션
@@ -134,20 +186,20 @@ export default function Chat() {
       <View style={styles.topHalf}>
         <View style={styles.genderIcons}>
           {/* 남성 아이콘 */}
-          <TouchableOpacity onPress={() => setSelectedGender('male')}>
+          <TouchableOpacity onPress={() => setSelectedGender('MALE')}>
             <IoniconsIcon
               name="male-outline"
               size={30}
-              color={selectedGender === 'male' ? '#58A6FF' : 'black'}
+              color={selectedGender === 'MALE' ? '#58A6FF' : 'black'}
             />
           </TouchableOpacity>
 
           {/* 여성 아이콘 */}
-          <TouchableOpacity onPress={() => setSelectedGender('female')}>
+          <TouchableOpacity onPress={() => setSelectedGender('FEMALE')}>
             <IoniconsIcon
               name="female-outline"
               size={30}
-              color={selectedGender === 'female' ? '#D99BFF' : 'black'}
+              color={selectedGender === 'FEMALE' ? '#D99BFF' : 'black'}
             />
           </TouchableOpacity>
         </View>
@@ -155,7 +207,9 @@ export default function Chat() {
         <TouchableOpacity
           style={styles.previousConversationButton}
           onPress={() => {
-            console.log('이전');
+            navigation.navigate('SeniorChatRecordScreen', {
+              elderlyId: elderlyId,
+            });
           }}>
           <Text style={styles.previousConversationText}>
             이전 대화 확인하기
@@ -166,16 +220,21 @@ export default function Chat() {
           style={styles.scrollTop}
           contentContainerStyle={styles.topHalfContent}
           showsVerticalScrollIndicator={false}>
-          <Text style={styles.topText}>{streamResponse}</Text>
+          <Text style={styles.topText}>{responseText}</Text>
         </ScrollView>
 
-        {/* 로딩 스피너 부분
-        <View style={styles.spinnerContainer}>
-          <Animated.View style={[styles.spinner, { transform: [{ rotate: spin }] }]} />
-          <Text style={styles.loadingText}>이음이가 답변을</Text>
-          <Text style={styles.loadingText}>고민하는 중이에요...</Text>
-        </View>
-        */}
+        {isLoading && (
+          <View style={styles.spinnerContainer}>
+            <Animated.View
+              style={[styles.spinner, {transform: [{rotate: spin}]}]}
+            />
+            <Text
+              style={
+                styles.loadingText
+              }>{`이음이가 답변을\n고민하는 중이에요😄`}</Text>
+            <Text style={styles.loadingText}></Text>
+          </View>
+        )}
       </View>
 
       <View style={styles.bottomHalf}>
@@ -183,14 +242,16 @@ export default function Chat() {
           style={styles.scrollBottom}
           contentContainerStyle={styles.bottomHalfContent}
           showsVerticalScrollIndicator={false}>
-          <Text style={styles.bottomText}>{dummyData[0]}</Text>
+          <Text style={styles.bottomText}>{viewRequestText}</Text>
         </ScrollView>
       </View>
 
       <View style={styles.micContainer}>
         <View style={styles.outerBorder}>
           <View style={styles.middleBorder}>
-            <TouchableOpacity style={styles.micButton} onPress={handleMicPress}>
+            <TouchableOpacity
+              style={styles.micButton}
+              onPress={isListening ? stopListening : startListening}>
               {isRecording ? (
                 <IoniconsIcon name="stop-outline" size={40} color="red" />
               ) : (
@@ -209,16 +270,12 @@ export default function Chat() {
           value={requestText}
           onChangeText={setRequestText}
         />
-        <TouchableOpacity style={styles.sendButton} onPress={handleSend}>
+        <TouchableOpacity style={styles.sendButton} onPress={handleTextSend}>
           <FeatherIcon name="send" size={25} color="#3369FF" />
         </TouchableOpacity>
       </View>
 
-      <TouchableOpacity
-        style={styles.closeButton}
-        onPress={() => {
-          console.log('닫기');
-        }}>
+      <TouchableOpacity style={styles.closeButton} onPress={handleBackPress}>
         <FeatherIcon name="x" size={35} color="black" />
       </TouchableOpacity>
     </View>
@@ -299,6 +356,8 @@ const styles = StyleSheet.create({
     fontSize: 21,
     color: 'black',
     fontWeight: 'bold',
+    marginBottom: 50,
+    textAlign: 'center',
   },
   topText: {
     fontSize: 30,

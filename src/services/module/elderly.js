@@ -17,6 +17,9 @@ const elderly = {
   getStreamText: (elderlyId, data) => {
     return axiosInstance.post(`/elderlys/${elderlyId}/stream-message`, data);
   },
+  getNonStreamText: (elderlyId, data) => {
+    return axiosInstance.post(`/elderlys/${elderlyId}/message`, data);
+  },
   emergencyAlert: (elderlyId, caregiverId) => {
     return axiosInstance.post(
       `/elderlys/${elderlyId}/caregivers/${caregiverId}/emergency-alerts`,

@@ -98,6 +98,36 @@ const caregiver = {
       {memo: content},
     );
   },
+  getWeeklyReportList: elderlyId => {
+    return axiosInstance.get(
+      `/caregivers/elderlys/${elderlyId}/weekly-reports`,
+      {
+        params: {
+          limit: 100,
+        },
+      },
+    );
+  },
+  getMonthlyReportList: elderlyId => {
+    return axiosInstance.get(
+      `/caregivers/elderlys/${elderlyId}/monthly-reports`,
+      {
+        params: {
+          limit: 100,
+        },
+      },
+    );
+  },
+  getWeeklyReportData: (elderlyId, reportId) => {
+    return axiosInstance.get(
+      `/caregivers/elderlys/${elderlyId}/weekly-reports/${reportId}`,
+    );
+  },
+  getMonthlyReportData: (elderlyId, reportId) => {
+    return axiosInstance.get(
+      `/caregivers/elderlys/${elderlyId}/monthly-reports/${reportId}`,
+    );
+  },
 };
 
 export default caregiver;

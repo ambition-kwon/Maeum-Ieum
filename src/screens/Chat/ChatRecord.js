@@ -1,33 +1,94 @@
-import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
+import React, {useEffect, useState} from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  ScrollView,
+  Alert,
+} from 'react-native';
+import {useNavigation, useRoute} from '@react-navigation/native';
+import {elderly} from '../../services/controller';
 
 const messages = [
-  { id: 1, text: "오늘 할 일을 알려줄래?", time: "08.18 / 17:00", isSent: true },
-  { id: 2, text: "오늘은 담당 요양사가 방문하는 날입니다!", time: "08.18 / 17:01", isSent: false },
-  { id: 3, text: "오늘 할 일을 알려줄래?", time: "08.18 / 17:00", isSent: true },
-  { id: 4, text: "오늘은 담당 요양사가 방문하는 날입니다!", time: "08.18 / 17:01", isSent: false },
-  { id: 5, text: "오늘 할 일을 알려줄래?", time: "08.18 / 17:00", isSent: true },
-  { id: 6, text: "오늘은 담당 요양사가 방문하는 날입니다!", time: "08.18 / 17:01", isSent: false },
-  { id: 7, text: "오늘 할 일을 알려줄래?", time: "08.18 / 17:00", isSent: true },
-  { id: 8, text: "오늘은 담당 요양사가 방문하는 날입니다!", time: "08.18 / 17:01", isSent: false },
-  { id: 9, text: "오늘 할 일을 알려줄래?", time: "08.18 / 17:00", isSent: true },
-  { id: 10, text: "오늘은 담당 요양사가 방문하는 날입니다!", time: "08.18 / 17:01", isSent: false },
+  {id: 1, text: '오늘 할 일을 알려줄래?', time: '08.18 / 17:00', isSent: true},
+  {
+    id: 2,
+    text: '오늘은 담당 요양사가 방문하는 날입니다!',
+    time: '08.18 / 17:01',
+    isSent: false,
+  },
+  {id: 3, text: '오늘 할 일을 알려줄래?', time: '08.18 / 17:00', isSent: true},
+  {
+    id: 4,
+    text: '오늘은 담당 요양사가 방문하는 날입니다!',
+    time: '08.18 / 17:01',
+    isSent: false,
+  },
+  {id: 5, text: '오늘 할 일을 알려줄래?', time: '08.18 / 17:00', isSent: true},
+  {
+    id: 6,
+    text: '오늘은 담당 요양사가 방문하는 날입니다!',
+    time: '08.18 / 17:01',
+    isSent: false,
+  },
+  {id: 7, text: '오늘 할 일을 알려줄래?', time: '08.18 / 17:00', isSent: true},
+  {
+    id: 8,
+    text: '오늘은 담당 요양사가 방문하는 날입니다!',
+    time: '08.18 / 17:01',
+    isSent: false,
+  },
+  {id: 9, text: '오늘 할 일을 알려줄래?', time: '08.18 / 17:00', isSent: true},
+  {
+    id: 10,
+    text: '오늘은 담당 요양사가 방문하는 날입니다!',
+    time: '08.18 / 17:01',
+    isSent: false,
+  },
 ];
 
 export default function ChatRecord() {
-  const renderItem = (item) => (
-    // 각 메시지를 전송 여부에 따라 다른 style을 적용
+  const renderItem = (item, index) => (
     // isSent가 true이면 흰색 말풍선, false이면 노란 말풍선
-    <View key={item.id} style={[styles.messageContainer, item.isSent ? styles.sent : styles.received]}>
-      <Text style={styles.messageText}>{item.text}</Text>
+    <View
+      key={index}
+      style={[
+        styles.messageContainer,
+        item.role === 'USER' ? styles.sent : styles.received,
+      ]}>
+      <Text style={styles.messageText}>{item.content}</Text>
       {/* 메시지 시간, isSent가 true (사용자가 전송한 메시지)일 경우 sentTime 스타일 적용 */}
-      <Text style={[styles.messageTime, item.isSent && styles.sentTime]}>{item.time}</Text>
+      <Text style={[styles.messageTime, item.isSent && styles.sentTime]}>
+        {item.timeStamp}
+      </Text>
     </View>
   );
+  const navigation = useNavigation();
+  const route = useRoute();
+  const {elderlyId} = route.params;
+  const [chatData, setChatData] = useState([]);
 
   const handleBackPress = () => {
-    console.log("이전 화면으로");
+    navigation.goBack();
   };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await elderly.getBeforeChat(elderlyId, 0, 999);
+        const reversedChatData = response.data.data.chat.reverse();
+        setChatData(reversedChatData);
+      } catch (error) {
+        Alert.alert(
+          '오류',
+          '서버 오류로 인해 이음이와의 대화 기록을 볼 수 없어요.',
+        );
+        console.log(JSON.stringify(error.response.data, null, 2));
+      }
+    };
+    fetchData();
+  }, []);
 
   return (
     <View style={styles.container}>
@@ -35,7 +96,7 @@ export default function ChatRecord() {
 
       <ScrollView showsVerticalScrollIndicator={false}>
         {/* 메시지 배열 렌더링 */}
-        {messages.map((item) => renderItem(item))}
+        {chatData.map(item => renderItem(item))}
       </ScrollView>
 
       {/* 뒤로가기 버튼 */}

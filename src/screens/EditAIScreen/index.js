@@ -40,6 +40,7 @@ const EditAIScreen = () => {
         routes: [{name: 'ExpertMainScreen'}],
       });
     } catch (error) {
+      Alert.alert('오류', '서버 오류로 인해 AI가 수정되지 않았습니다.');
       console.log(error.response.data);
     }
   };
@@ -62,6 +63,7 @@ const EditAIScreen = () => {
               routes: [{name: 'ExpertMainScreen'}],
             });
           } catch (error) {
+            Alert.alert('오류', '서버 오류로 인해 AI가 삭제되지 않았습니다.');
             console.log(error.response.data);
           }
         },
@@ -75,6 +77,10 @@ const EditAIScreen = () => {
       const response = await caregiver.ruleGenerate(elderlyId, requiredRule);
       setRequiredRule(response.data.data.mandatoryRule);
     } catch (error) {
+      Alert.alert(
+        '오류',
+        '서버 오류로 인해 자동적으로 규칙이 완성되지 않았습니다.',
+      );
       console.log(JSON.stringify(error.response.data, null, 2));
     }
   };

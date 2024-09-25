@@ -43,6 +43,10 @@ export default function RegisterNote() {
         await elderly.signup(formData);
         navigation.navigate('SignupCompleteElder');
       } catch (error) {
+        Alert.alert(
+          '오류',
+          '서버 오류로 인해 어르신 추가가 이루어지지 않았습니다.',
+        );
         console.log(JSON.stringify(error.response.data, null, 2));
       }
     } else {

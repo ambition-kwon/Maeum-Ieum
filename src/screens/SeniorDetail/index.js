@@ -22,14 +22,8 @@ const SeniorDetail = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [showWeeklyReportsModal, setShowWeeklyReportsModal] = useState(false);
   const [showMonthlyReportsModal, setShowMonthlyReportsModal] = useState(false);
-  const [weeklyReports, setWeeklyReports] = useState([
-    'Weekly Report 1',
-    'Weekly Report 2',
-  ]);
-  const [monthlyReports, setMonthlyReports] = useState([
-    'Monthly Report 1',
-    'Monthly Report 2',
-  ]);
+  const [weeklyReports, setWeeklyReports] = useState([]);
+  const [monthlyReports, setMonthlyReports] = useState([]);
   const [isDatePickerVisible, setIsDatePickerVisible] = useState(false);
   const [date, setDate] = useState(new Date());
 
@@ -72,6 +66,7 @@ const SeniorDetail = () => {
               routes: [{name: 'ExpertMainScreen'}],
             });
           } catch (error) {
+            Alert.alert('오류', '서버 문제로 인해 삭제되지 않았습니다.');
             console.log(error.response.data);
           }
         },
@@ -115,7 +110,35 @@ const SeniorDetail = () => {
         console.log(error.response.data);
       }
     };
+
+    const fetchWeeklyReports = async () => {
+      try {
+        const response = await caregiver.getWeeklyReportList(elderlyId);
+        setWeeklyReports(response.data.data.reportList);
+      } catch (error) {
+        Alert.alert(
+          '오류',
+          '서버 오류로 인해 보고서 정보를 불러올 수 없습니다.',
+        );
+        console.log(JSON.stringify(error.response.data, null, 2));
+      }
+    };
+
+    const fetchMonthlyReports = async () => {
+      try {
+        const response = await caregiver.getMonthlyReportList(elderlyId);
+        setMonthlyReports(response.data.data.reportList);
+      } catch (error) {
+        Alert.alert(
+          '오류',
+          '서버 오류로 인해 보고서 정보를 불러올 수 없습니다.',
+        );
+        console.log(JSON.stringify(error.response.data, null, 2));
+      }
+    };
     fetchData();
+    fetchWeeklyReports();
+    fetchMonthlyReports();
   }, []);
 
   const toggleEditing = async () => {
@@ -227,6 +250,7 @@ const SeniorDetail = () => {
               });
             })
             .catch(error => {
+              Alert.alert('오류', '첨부하신 이미지를 다시 한번 확인해주세요.');
               console.log(JSON.stringify(error.response.data, null, 2));
             });
         } catch (error) {
@@ -507,8 +531,17 @@ const SeniorDetail = () => {
         <View style={styles.modalContainer}>
           <Text style={styles.modalTitle}>주간 보고서</Text>
           {weeklyReports.map((report, index) => (
-            <TouchableOpacity key={index} style={styles.reportButton}>
-              <Text>{report}</Text>
+            <TouchableOpacity
+              key={index}
+              style={styles.reportButton}
+              onPress={() => {
+                setShowWeeklyReportsModal(false);
+                navigation.navigate('WeeklyReportScreen', {
+                  reportId: report.reportId,
+                  elderlyId: elderlyId,
+                });
+              }}>
+              <Text>{`주간 보고서(${report.startDate})`}</Text>
             </TouchableOpacity>
           ))}
           <TouchableOpacity
@@ -524,8 +557,17 @@ const SeniorDetail = () => {
         <View style={styles.modalContainer}>
           <Text style={styles.modalTitle}>월간 보고서</Text>
           {monthlyReports.map((report, index) => (
-            <TouchableOpacity key={index} style={styles.reportButton}>
-              <Text>{report}</Text>
+            <TouchableOpacity
+              key={index}
+              style={styles.reportButton}
+              onPress={() => {
+                setShowMonthlyReportsModal(false);
+                navigation.navigate('MonthlyReportScreen', {
+                  reportId: report.reportId,
+                  elderlyId: elderlyId,
+                });
+              }}>
+              <Text>{`월간 보고서(${report.startDate})`}</Text>
             </TouchableOpacity>
           ))}
           <TouchableOpacity

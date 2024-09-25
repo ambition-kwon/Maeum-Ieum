@@ -20,7 +20,7 @@ const EditInfo = () => {
   const navigation = useNavigation();
   const [data, setData] = useState({
     name: '',
-    imgUrl: 'https://via.placeholder.com/50',
+    imgUrl: 'https://via.placeholder.com/150',
     gender: '',
     birthDate: '',
     organization: '',
@@ -61,6 +61,7 @@ const EditInfo = () => {
       await caregiver.editMypage(updatedData);
       Alert.alert('알림', '성공적으로 수정이 완료되었습니다.');
     } catch (error) {
+      Alert.alert('오류', '입력하신 정보를 다시 확인해주세요.');
       console.log(JSON.stringify(error.response.data, null, 2));
     }
   };
@@ -78,6 +79,7 @@ const EditInfo = () => {
       formData.append('img', updatedImage);
       await caregiver.editMypageImg(formData);
     } catch (error) {
+      Alert.alert('오류', '첨부하신 이미지를 다시 확인해주세요.');
       console.log(JSON.stringify(error.response.data, null, 2));
     }
   };
@@ -201,7 +203,10 @@ const EditInfo = () => {
 
       <View style={styles.profileSection}>
         <TouchableOpacity onPress={handleProfilePress}>
-          <Image source={{uri: data.imgUrl}} style={styles.profileImage} />
+          <Image
+            source={{uri: data.imgUrl || 'https://via.placeholder.com/150'}}
+            style={styles.profileImage}
+          />
         </TouchableOpacity>
         <Text style={styles.profileName}>{data.name} 요양사</Text>
       </View>

@@ -40,6 +40,7 @@ const CreateAIScreen = () => {
         routes: [{name: 'ExpertMainScreen'}],
       });
     } catch (error) {
+      Alert.alert('오류', '서버 오류로 인해 AI가 생성되지 않았습니다.');
       console.log(error.response.data);
     }
   };
@@ -51,6 +52,10 @@ const CreateAIScreen = () => {
       console.log(JSON.stringify(response.data.data.mandatoryRule));
       setRequiredRule(response.data.data.mandatoryRule);
     } catch (error) {
+      Alert.alert(
+        '오류',
+        '서버 오류로 인해 자동적으로 규칙이 완성되지 않았습니다.',
+      );
       console.log(error.response.data);
     }
   };
