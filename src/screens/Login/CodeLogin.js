@@ -5,6 +5,7 @@ import {
   TextInput,
   TouchableOpacity,
   StyleSheet,
+  Alert,
 } from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import {elderly} from '../../services/controller';
@@ -20,6 +21,7 @@ export default function CodeLogin() {
         elderlyId: response.data.data.elderlyId,
       });
     } catch (error) {
+      Alert.alert('오류', '로그인이 실패하였습니다.\n코드를 재 확인해 주세요.');
       console.log(JSON.stringify(error.response, null, 2));
     }
   };

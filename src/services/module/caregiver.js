@@ -69,6 +69,16 @@ const caregiver = {
   editElderly: (elderlyId, data) => {
     return axiosInstance.patch(`/caregivers/elderlys/${elderlyId}`, data);
   },
+  editElderlyImage: (elderlyId, data) => {
+    return axiosInstance.patch(`caregivers/elderlys/${elderlyId}/image`, data, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+  },
+  deleteElderly: elderlyId => {
+    return axiosInstance.delete(`/caregivers/elderlys/${elderlyId}`);
+  },
   editReportDay: (elderlyId, reportDay) => {
     return axiosInstance.patch(`/caregivers/elderlys/${elderlyId}/report`, {
       reportDay: reportDay,
@@ -81,6 +91,42 @@ const caregiver = {
         size: size,
       },
     });
+  },
+  editReportMemo: (elderlyId, reportId, content) => {
+    return axiosInstance.post(
+      `caregivers/elderlys/${elderlyId}/reports/${reportId}/memo`,
+      {memo: content},
+    );
+  },
+  getWeeklyReportList: elderlyId => {
+    return axiosInstance.get(
+      `/caregivers/elderlys/${elderlyId}/weekly-reports`,
+      {
+        params: {
+          limit: 100,
+        },
+      },
+    );
+  },
+  getMonthlyReportList: elderlyId => {
+    return axiosInstance.get(
+      `/caregivers/elderlys/${elderlyId}/monthly-reports`,
+      {
+        params: {
+          limit: 100,
+        },
+      },
+    );
+  },
+  getWeeklyReportData: (elderlyId, reportId) => {
+    return axiosInstance.get(
+      `/caregivers/elderlys/${elderlyId}/weekly-reports/${reportId}`,
+    );
+  },
+  getMonthlyReportData: (elderlyId, reportId) => {
+    return axiosInstance.get(
+      `/caregivers/elderlys/${elderlyId}/monthly-reports/${reportId}`,
+    );
   },
 };
 

@@ -1,50 +1,87 @@
-import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, TextInput, ScrollView, Dimensions } from 'react-native';
+import React, {useEffect, useState} from 'react';
+import {
+  Alert,
+  Dimensions,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import {caregiver} from '../../services/controller';
+import {useNavigation, useRoute} from '@react-navigation/native';
 
 const WeeklyReport = () => {
+  const navigation = useNavigation();
+  const route = useRoute();
+  const {elderlyId, reportId} = route.params;
   const [selectedTab, setSelectedTab] = useState('quantitative'); // 기본적으로 '정량적 분석' 선택
   const [currentIndex, setCurrentIndex] = useState(0); // 슬라이드 인덱스 관리
   const [isMemoVisible, setIsMemoVisible] = useState(false); // 메모 입력 필드 표시 여부
   const [memoText, setMemoText] = useState(''); // 메모 입력 필드 내용
   const [savedMemo, setSavedMemo] = useState(''); // 저장된 메모
+  const [data, setData] = useState({});
+  const getIconByStatus = status => {
+    switch (status) {
+      case '아주 좋아요':
+        return 'emoticon-excited-outline';
+      case '좋아요':
+        return 'emoticon-happy-outline';
+      case '그냥 그래요':
+        return 'emoticon-neutral-outline';
+      case '별로예요':
+        return 'emoticon-sad-outline';
+      case '정말 별로예요':
+        return 'emoticon-cry-outline';
+      default:
+        return 'emoticon-neutral-outline';
+    }
+  };
 
-  // 나중에 여기 icon에 대한 것을 backend에서 받아와서 그에 맞는 아이콘으로 변경해야 함
   const indicators = [
     {
       title: '건강 상태 지표',
-      description: '건강 상태 지표에 대한 2~3줄 정도의 간략한 요약이 담기면 좋겠네요. 이상입니다. 수고하셨어요',
-      icon: 'emoticon-sad-outline',
+      description: data?.quantitativeAnalysis?.healthStatusIndicator,
+      icon: getIconByStatus(data?.healthStatus),
+      status: data?.healthStatus,
     },
     {
       title: '사회적 연결성 지표',
-      description: '사회적 연결성 지표에 대한 분석 결과가 여기에 표시됩니다.',
-      icon: 'emoticon-neutral-outline',
+      description: data?.quantitativeAnalysis?.socialConnectivityIndicator,
+      icon: getIconByStatus(data?.socialConnectivity),
+      status: data?.socialConnectivity,
     },
     {
       title: '심리적 안정 지표',
-      description: '심리적 안정 지표에 대한 분석 결과가 여기에 표시됩니다.',
-      icon: 'emoticon-happy-outline',
+      description: data?.quantitativeAnalysis?.psychologicalStabilityIndicator,
+      icon: getIconByStatus(data?.psychologicalStability),
+      status: data?.psychologicalStability,
     },
     {
       title: '생활 만족도 지표',
-      description: '생활 만족도 지표에 대한 분석 결과가 여기에 표시됩니다.',
-      icon: 'emoticon-outline',
+      description: data?.quantitativeAnalysis?.lifeSatisfactionIndicator,
+      icon: getIconByStatus(data?.lifeSatisfaction),
+      status: data?.lifeSatisfaction,
     },
     {
       title: '인지 기능 지표',
-      description: '인지 기능 지표에 대한 분석 결과가 여기에 표시됩니다.',
-      icon: 'emoticon-excited-outline',
+      description: data?.quantitativeAnalysis?.cognitiveFunctionIndicator,
+      icon: getIconByStatus(data?.cognitiveFunction),
+      status: data?.cognitiveFunction,
     },
     {
       title: '활동 수준 지표',
-      description: '활동 수준 지표에 대한 분석 결과가 여기에 표시됩니다.',
-      icon: 'emoticon-neutral-outline',
+      description: data?.quantitativeAnalysis?.activityLevelIndicator,
+      icon: getIconByStatus(data?.activityLevel),
+      status: data?.activityLevel,
     },
     {
       title: '필요 지원 지표',
-      description: '필요 지원 지표에 대한 분석 결과가 여기에 표시됩니다.',
-      icon: 'emoticon-excited-outline',
+      description: data?.quantitativeAnalysis?.supportNeedsIndicator,
+      icon: getIconByStatus(data?.supportNeeds),
+      status: data?.supportNeeds,
     },
   ];
 
@@ -60,25 +97,48 @@ const WeeklyReport = () => {
     }
   };
 
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await caregiver.getWeeklyReportData(
+          elderlyId,
+          reportId,
+        );
+        setData(response.data.data);
+        setMemoText(response.data.data.memo);
+        console.log(JSON.stringify(response.data.data, null, 2));
+      } catch (error) {
+        console.log(JSON.stringify(error.response.data, null, 2));
+      }
+    };
+    fetchData();
+  }, []);
+
   const renderContent = () => {
     if (selectedTab === 'quantitative') {
-      const { title, description, icon } = indicators[currentIndex];
+      const {title, description, icon, status} = indicators[currentIndex];
 
       return (
         <View style={styles.analysisContainer}>
           <Text style={styles.analysisTitle}>분석 결과</Text>
           <View style={styles.resultContainer}>
-            <TouchableOpacity onPress={handlePrevious} disabled={currentIndex === 0} style={styles.leftArrow}>
-              <Text style={styles.navButtonText}>{"<"}</Text>
+            <TouchableOpacity
+              onPress={handlePrevious}
+              disabled={currentIndex === 0}
+              style={styles.leftArrow}>
+              <Text style={styles.navButtonText}>{'<'}</Text>
             </TouchableOpacity>
-            <TouchableOpacity onPress={handleNext} disabled={currentIndex === indicators.length - 1} style={styles.rightArrow}>
-              <Text style={styles.navButtonText}>{">"}</Text>
+            <TouchableOpacity
+              onPress={handleNext}
+              disabled={currentIndex === indicators.length - 1}
+              style={styles.rightArrow}>
+              <Text style={styles.navButtonText}>{'>'}</Text>
             </TouchableOpacity>
             <Text style={styles.resultTitle}>{title}</Text>
             <View style={styles.resultIconContainer}>
               <MaterialCommunityIcons name={icon} size={70} color="#000" />
             </View>
-            <Text style={styles.resultStatus}>매우 나쁨</Text>
+            <Text style={styles.resultStatus}>{status}</Text>
             <Text style={styles.resultDescription}>{description}</Text>
           </View>
         </View>
@@ -89,7 +149,7 @@ const WeeklyReport = () => {
           <Text style={styles.analysisTitle}>정성적 분석 결과</Text>
           <View style={styles.resultContainer}>
             <Text style={styles.resultDescription}>
-              본 어르신의 전반적인 상태를 분석한 결과, 심리적 지원이 필요함을 확인했습니다. 외로움과 불안을 줄이기 위해 정기적인 상담 및 심리 지원 프로그램을 제공하는 것이 중요합니다. 건강 관리 측면에서는 관절 통증과 같은 건강 문제에 대한 정기적인 검진과 치료 지원을 강화해야 합니다. 또한, 사회적 연결을 증진하기 위해 사회적 활동 참여 기회를 늘리고, 가족 및 친구와의 교류를 촉진하는 프로그램을 개발하는 것이 필요합니다. 생활 만족도를 향상시키기 위해서는 주거 환경을 개선하고, 일상 활동을 지원하는 것이 중요합니다. 마지막으로, 인지 기능 강화를 위해 인지 자극 활동을 제공하여 인지 기능을 유지하고 향상시킬 필요가 있습니다. 이러한 종합적인 지원을 통해 독거노인들의 삶의 질을 전반적으로 향상시킬 수 있을 것입니다.
+              {data.qualitativeAnalysis || '정량적 분석이 진행되지 않았습니다.'}
             </Text>
           </View>
         </View>
@@ -98,9 +158,17 @@ const WeeklyReport = () => {
   };
 
   // 메모 저장 함수
-  const handleSaveMemo = () => {
-    setSavedMemo(memoText); // 입력된 메모 저장
-    setIsMemoVisible(false); // 메모 입력 필드 숨김
+  const handleSaveMemo = async () => {
+    try {
+      await caregiver.editReportMemo(elderlyId, reportId, memoText);
+      setSavedMemo(memoText); // 입력된 메모 저장
+      setIsMemoVisible(false); // 메모 입력 필드 숨김
+      Alert.alert('알림', '메모 저장이 완료되었습니다.');
+    } catch (error) {
+      Alert.alert('오류', '서버 오류로 인해 메모가 저장되지 않았습니다.');
+      console.log(JSON.stringify(error.response.data, null, 2));
+      setIsMemoVisible(false); // 메모 입력 필드 숨김
+    }
   };
 
   // 메모 수정 버튼을 누르면 입력 필드 표시
@@ -112,28 +180,48 @@ const WeeklyReport = () => {
   return (
     <View style={styles.container}>
       <View style={styles.headerContainer}>
-        <TouchableOpacity style={styles.backButton}>
-          <Text style={styles.backButtonText}>{"<"}</Text>
+        <TouchableOpacity
+          style={styles.backButton}
+          onPress={() => navigation.goBack()}>
+          <Text style={styles.backButtonText}>{'<'}</Text>
         </TouchableOpacity>
         <View style={styles.headerTextContainer}>
-          <Text style={styles.headerTitle}>권혁원 어르신</Text>
+          <Text style={styles.headerTitle}>{data.elderlyName} 어르신</Text>
           <Text style={styles.headerSubtitle}>주간 보고서</Text>
-          <Text style={styles.headerDate}>2024.07.07(일) ~ 2024.07.13(토)</Text>
+          <Text style={styles.headerDate}>
+            {data.startDate} ~ {data.endDate}
+          </Text>
         </View>
       </View>
 
       <View style={styles.tabContainer}>
         <TouchableOpacity
-          style={[styles.tabButton, selectedTab === 'quantitative' && styles.activeTab]}
-          onPress={() => setSelectedTab('quantitative')}
-        >
-          <Text style={[styles.tabText, selectedTab === 'quantitative' && styles.activeTabText]}>정량적 분석</Text>
+          style={[
+            styles.tabButton,
+            selectedTab === 'quantitative' && styles.activeTab,
+          ]}
+          onPress={() => setSelectedTab('quantitative')}>
+          <Text
+            style={[
+              styles.tabText,
+              selectedTab === 'quantitative' && styles.activeTabText,
+            ]}>
+            정량적 분석
+          </Text>
         </TouchableOpacity>
         <TouchableOpacity
-          style={[styles.tabButton, selectedTab === 'qualitative' && styles.activeTab]}
-          onPress={() => setSelectedTab('qualitative')}
-        >
-          <Text style={[styles.tabText, selectedTab === 'qualitative' && styles.activeTabText]}>정성적 분석</Text>
+          style={[
+            styles.tabButton,
+            selectedTab === 'qualitative' && styles.activeTab,
+          ]}
+          onPress={() => setSelectedTab('qualitative')}>
+          <Text
+            style={[
+              styles.tabText,
+              selectedTab === 'qualitative' && styles.activeTabText,
+            ]}>
+            정성적 분석
+          </Text>
         </TouchableOpacity>
       </View>
 
@@ -151,7 +239,9 @@ const WeeklyReport = () => {
                 placeholder="내용을 입력해주세요"
                 placeholderTextColor="#c4c4c4"
               />
-              <TouchableOpacity style={styles.saveMemoButton} onPress={handleSaveMemo}>
+              <TouchableOpacity
+                style={styles.saveMemoButton}
+                onPress={handleSaveMemo}>
                 <Text style={styles.saveMemoButtonText}>메모 저장</Text>
               </TouchableOpacity>
             </>
@@ -160,12 +250,16 @@ const WeeklyReport = () => {
               {savedMemo ? (
                 <>
                   <Text style={styles.savedMemo}>{savedMemo}</Text>
-                  <TouchableOpacity style={styles.memoButton} onPress={handleMemoEdit}>
+                  <TouchableOpacity
+                    style={styles.memoButton}
+                    onPress={handleMemoEdit}>
                     <Text style={styles.memoButtonText}>메모 수정</Text>
                   </TouchableOpacity>
                 </>
               ) : (
-                <TouchableOpacity style={styles.memoButton} onPress={() => setIsMemoVisible(true)}>
+                <TouchableOpacity
+                  style={styles.memoButton}
+                  onPress={() => setIsMemoVisible(true)}>
                   <Text style={styles.memoButtonText}>메모 작성</Text>
                 </TouchableOpacity>
               )}
@@ -177,7 +271,7 @@ const WeeklyReport = () => {
   );
 };
 
-const { width } = Dimensions.get('window');
+const {width} = Dimensions.get('window');
 
 const styles = StyleSheet.create({
   container: {
@@ -288,7 +382,6 @@ const styles = StyleSheet.create({
   },
   memoContainer: {
     padding: 20,
-
   },
   memoLabel: {
     fontSize: 20,
@@ -342,13 +435,13 @@ const styles = StyleSheet.create({
     position: 'absolute',
     left: 10,
     top: '50%',
-    transform: [{ translateY: -12 }],
+    transform: [{translateY: -12}],
   },
   rightArrow: {
     position: 'absolute',
     right: 10,
     top: '50%',
-    transform: [{ translateY: -12 }],
+    transform: [{translateY: -12}],
   },
 });
 

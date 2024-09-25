@@ -14,6 +14,7 @@ import FontAwesome6Icon from 'react-native-vector-icons/FontAwesome6';
 import OcticonsIcon from 'react-native-vector-icons/Octicons';
 import {useNavigation, useRoute} from '@react-navigation/native';
 import {elderly} from '../../services/controller';
+import {Linking} from 'react-native';
 
 export default function Main() {
   const [showHelpButtons, setShowHelpButtons] = useState(false);
@@ -41,6 +42,10 @@ export default function Main() {
         `${data.caregiverName}요양사님께 긴급알림을 성공적으로 전송하였습니다.`,
       );
     } catch (error) {
+      Alert.alert(
+        '오류',
+        '서버 오류로 인해 요양사님께 알림이 전송되지 않았어요.',
+      );
       console.log(JSON.stringify(error.response.data, null, 2));
     }
   };
@@ -55,8 +60,21 @@ export default function Main() {
         elderlyId: elderlyId,
       });
     } catch (error) {
+      Alert.alert('오류', '서버 오류로 인해 이음이와의 대화가 불가능해요.');
       console.log(JSON.stringify(error.response.data, null, 2));
     }
+  };
+
+  const callPolice = () => {
+    Linking.openURL('tel:112'); // 112는 경찰 전화번호입니다.
+  };
+
+  const callHospital = () => {
+    Linking.openURL('tel:119'); // 112는 경찰 전화번호입니다.
+  };
+
+  const callCaregiver = () => {
+    Linking.openURL(`tel:${data.caregiverContact}`); // 112는 경찰 전화번호입니다.
   };
 
   useEffect(() => {
@@ -129,6 +147,7 @@ export default function Main() {
         ) : (
           <View style={styles.helpButtonsContainer}>
             <TouchableOpacity
+              onPress={callPolice}
               style={[
                 styles.button,
                 styles.additionalButton,
@@ -142,6 +161,7 @@ export default function Main() {
               <Text style={styles.buttonText}>경찰 신고</Text>
             </TouchableOpacity>
             <TouchableOpacity
+              onPress={callHospital}
               style={[
                 styles.button,
                 styles.additionalButton,
@@ -161,6 +181,7 @@ export default function Main() {
               <Text style={styles.buttonText}>요양사 알림</Text>
             </TouchableOpacity>
             <TouchableOpacity
+              onPress={callCaregiver}
               style={[
                 styles.button,
                 styles.additionalButton,

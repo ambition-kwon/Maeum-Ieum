@@ -30,6 +30,8 @@ import Main from '../screens/Main/Main';
 import Chat from '../screens/Chat/Chat';
 import WeeklyReport from '../screens/WeeklyReport';
 import MonthlyReport from '../screens/MonthlyReport';
+import ChatRecord from '../screens/Chat/ChatRecord';
+import NotificationHistory from '../screens/NotificationHistory';
 
 const Stack = createStackNavigator();
 
@@ -173,6 +175,11 @@ export default function SignupNavigator() {
           options={{headerShown: false}}
         />
         <Stack.Screen
+          name="SeniorChatRecordScreen"
+          component={ChatRecord}
+          options={{headerShown: false}}
+        />
+        <Stack.Screen
           name="WeeklyReportScreen"
           component={WeeklyReport}
           options={{headerShown: false}}
@@ -180,6 +187,11 @@ export default function SignupNavigator() {
         <Stack.Screen
           name="MonthlyReportScreen"
           component={MonthlyReport}
+          options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name="ExpertNotificationScreen"
+          component={NotificationHistory}
           options={{headerShown: false}}
         />
       </Stack.Navigator>

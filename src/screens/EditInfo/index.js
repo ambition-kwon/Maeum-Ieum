@@ -20,7 +20,7 @@ const EditInfo = () => {
   const navigation = useNavigation();
   const [data, setData] = useState({
     name: '',
-    imgUrl: 'https://via.placeholder.com/50',
+    imgUrl: 'https://via.placeholder.com/150',
     gender: '',
     birthDate: '',
     organization: '',
@@ -56,11 +56,12 @@ const EditInfo = () => {
     ]);
   };
 
-  const handlePatch = async () => {
+  const handlePatch = async updatedData => {
     try {
-      const response = await caregiver.editMypage(data);
-      console.log(JSON.stringify(response.data.data, null, 2));
+      await caregiver.editMypage(updatedData);
+      Alert.alert('알림', '성공적으로 수정이 완료되었습니다.');
     } catch (error) {
+      Alert.alert('오류', '입력하신 정보를 다시 확인해주세요.');
       console.log(JSON.stringify(error.response.data, null, 2));
     }
   };
@@ -70,6 +71,17 @@ const EditInfo = () => {
     const month = dateString.substring(6, 8);
     const day = dateString.substring(10, 12);
     return `${year}-${month}-${day}`;
+  };
+
+  const handlePatchImage = async updatedImage => {
+    try {
+      const formData = new FormData();
+      formData.append('img', updatedImage);
+      await caregiver.editMypageImg(formData);
+    } catch (error) {
+      Alert.alert('오류', '첨부하신 이미지를 다시 확인해주세요.');
+      console.log(JSON.stringify(error.response.data, null, 2));
+    }
   };
 
   useEffect(() => {
@@ -102,13 +114,27 @@ const EditInfo = () => {
       } else if (response.errorMessage) {
         console.log('ImagePicker Error: ', response.errorMessage);
       } else if (response.assets && response.assets.length > 0) {
-        const selectedImageUri = response.assets[0].uri;
-        // 이미지 URI를 data 상태에 업데이트
-        setData(prevData => ({
-          ...prevData,
-          imgUrl: selectedImageUri,
-        }));
-        // 여기에서 서버로 이미지를 업로드하는 API 호출을 추가할 수 있음
+        try {
+          setData(prevData => ({
+            ...prevData,
+            imgUrl: response.assets[0].uri,
+          }));
+          // 서버 이미지 변경 API
+          const imageData = {
+            uri: response.assets[0].uri,
+            type: response.assets[0].type,
+            name: `image_${Date.now()}`,
+          };
+          handlePatchImage(imageData)
+            .then(() => {
+              Alert.alert('알림', '이미지를 성공적으로 변경하였습니다.');
+            })
+            .catch(error => {
+              console.log(JSON.stringify(error.response.data, null, 2));
+            });
+        } catch (error) {
+          console.log(JSON.stringify(error.response.data, null, 2));
+        }
       }
     });
   };
@@ -127,11 +153,12 @@ const EditInfo = () => {
     const formattedDate = `${date.getFullYear()}-${String(
       date.getMonth() + 1,
     ).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
-    setData(prevData => ({
-      ...prevData,
-      birthDate: formattedDate, // 생년월일 필드를 수정된 값으로 설정
-    }));
-    handlePatch()
+    const newData = {
+      ...data,
+      birthDate: formattedDate,
+    };
+    setData(newData);
+    handlePatch(newData)
       .then(() => {
         setDatePickerVisibility(false); // DatePicker 닫기
       })
@@ -141,12 +168,13 @@ const EditInfo = () => {
       });
   };
 
-  const saveNewValue = () => {
-    setData(prevData => ({
-      ...prevData,
-      [currentField]: newValue, // 수정된 값을 저장
-    }));
-    handlePatch()
+  const saveNewValue = async () => {
+    const updatedData = {
+      ...data,
+      [currentField]: newValue,
+    };
+    setData(updatedData);
+    handlePatch(updatedData)
       .then(() => {
         setIsEditing(false); // 모달 닫기
       })
@@ -175,7 +203,10 @@ const EditInfo = () => {
 
       <View style={styles.profileSection}>
         <TouchableOpacity onPress={handleProfilePress}>
-          <Image source={{uri: data.imgUrl}} style={styles.profileImage} />
+          <Image
+            source={{uri: data.imgUrl || 'https://via.placeholder.com/150'}}
+            style={styles.profileImage}
+          />
         </TouchableOpacity>
         <Text style={styles.profileName}>{data.name} 요양사</Text>
       </View>

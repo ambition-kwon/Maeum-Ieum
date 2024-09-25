@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   View,
   Text,
@@ -11,15 +11,20 @@ import {
 import FontistoIcon from 'react-native-vector-icons/Fontisto';
 import OcticonsIcon from 'react-native-vector-icons/Octicons';
 import FeatherIcon from 'react-native-vector-icons/Feather';
-import { caregiver } from '../../services/controller';
-import { useNavigation } from '@react-navigation/native';
+import {caregiver} from '../../services/controller';
+import {useNavigation} from '@react-navigation/native';
 
-const Header = ({ img, name, organization, totalCareNumber }) => {
+const Header = ({img, name, organization, totalCareNumber}) => {
   const navigation = useNavigation();
+  const handleNavigateNotification = () => {
+    navigation.navigate('ExpertNotificationScreen');
+  };
   return (
     <View style={styles.header}>
       <View style={styles.iconContainer}>
-        <TouchableOpacity style={styles.circleButton}>
+        <TouchableOpacity
+          style={styles.circleButton}
+          onPress={handleNavigateNotification}>
           <FontistoIcon name="bell" size={30} color="black" />
         </TouchableOpacity>
         <TouchableOpacity
@@ -29,7 +34,7 @@ const Header = ({ img, name, organization, totalCareNumber }) => {
         </TouchableOpacity>
       </View>
       <View style={styles.profileContainer}>
-        <Image source={{ uri: img }} style={styles.profileImage} />
+        <Image source={{uri: img}} style={styles.profileImage} />
         <View style={styles.infoContainer}>
           <Text style={styles.nameText}>{name} 요양사님</Text>
           <Text style={styles.centerText}>{organization}</Text>
@@ -64,8 +69,7 @@ const SeniorCard = ({
   return (
     <TouchableOpacity
       style={styles.card}
-      onPress={() => navigation.navigate('SeniorDetailScreen', { elderlyId })}
-      >
+      onPress={() => navigation.navigate('SeniorDetailScreen', {elderlyId})}>
       <View style={styles.cardIdContainer}>
         <Text style={styles.cardId}>uid: {uid}</Text>
         <TouchableOpacity style={styles.copyButton} onPress={copyToClipboard}>
@@ -73,7 +77,7 @@ const SeniorCard = ({
         </TouchableOpacity>
       </View>
       <View style={styles.cardContent}>
-        <Image source={{ uri: img }} style={styles.cardImage} />
+        <Image source={{uri: img}} style={styles.cardImage} />
         <View style={styles.cardTextContainer}>
           <Text style={styles.cardName}>
             {name} ({age}살)
@@ -84,16 +88,18 @@ const SeniorCard = ({
         {assistantName ? (
           <TouchableOpacity
             style={styles.cardBadgeContainer}
-            onPress={() => navigation.navigate('EditAIScreen', {
-              elderlyId,
-              assistantId,
-            })}>
+            onPress={() =>
+              navigation.navigate('EditAIScreen', {
+                elderlyId,
+                assistantId,
+              })
+            }>
             <Text style={styles.cardBadge}>{assistantName}</Text>
           </TouchableOpacity>
         ) : (
           <TouchableOpacity
             style={styles.cardBadgeContainer}
-            onPress={() => navigation.navigate('CreateAIScreen', { elderlyId })}>
+            onPress={() => navigation.navigate('CreateAIScreen', {elderlyId})}>
             <Text style={styles.cardBadge}>+</Text>
           </TouchableOpacity>
         )}
@@ -115,7 +121,7 @@ const ExpertMainScreen = () => {
     caregiver
       .info()
       .then(response => {
-        setImg(response.data.data.img);
+        setImg(response.data.data.img || 'https://via.placeholder.com/150');
         setName(response.data.data.name);
         setOrganization(response.data.data.organization);
         setTotalCareNumber(response.data.data.totalCareNumber);
@@ -123,7 +129,10 @@ const ExpertMainScreen = () => {
       })
       .catch(error => {
         console.log(error.response.data);
-        navigation.navigate('Login');
+        navigation.reset({
+          index: 0,
+          routes: [{name: 'Login'}],
+        });
       });
   }, []);
 
@@ -156,7 +165,7 @@ const ExpertMainScreen = () => {
                 address={senior.homeAddress}
                 contact={senior.contact}
                 onCopy={handleCopy}
-                img={senior.img}
+                img={senior.img || 'https://via.placeholder.com/150'}
                 elderlyId={senior.elderlyId}
                 assistantName={senior.assistantName}
                 assistantId={senior.assistantId}
@@ -267,7 +276,7 @@ const styles = StyleSheet.create({
     marginVertical: 10,
     width: '90%',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
+    shadowOffset: {width: 0, height: 4},
     shadowOpacity: 0.1,
     shadowRadius: 5,
     elevation: 5,
@@ -355,7 +364,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
+    shadowOffset: {width: 0, height: 4},
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
     elevation: 5,

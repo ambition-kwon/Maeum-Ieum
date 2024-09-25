@@ -30,14 +30,6 @@ export default function Login() {
     }
   };
 
-  // 토큰 있을 경우 자동로그인
-  useEffect(() => {
-    const token = AsyncStorage.getItem('token');
-    if (token !== null) {
-      navigation.navigate('ExpertMainScreen');
-    }
-  }, []);
-
   return (
     <View style={styles.container}>
       <View style={styles.titleContainer}>
