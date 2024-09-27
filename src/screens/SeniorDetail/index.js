@@ -567,7 +567,7 @@ const SeniorDetail = () => {
                   elderlyId: elderlyId,
                 });
               }}>
-              <Text>{`월간 보고서(${report.startDate})`}</Text>
+              <Text style={styles.modalItem}>{`월간 보고서(${report.startDate})`}</Text>
             </TouchableOpacity>
           ))}
           <TouchableOpacity
