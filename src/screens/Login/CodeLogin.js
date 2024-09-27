@@ -113,5 +113,6 @@ const styles = StyleSheet.create({
   changeText: {
     textAlign: 'center',
     fontSize: 16,
+    color: '#B4B4B4',
   },
 });
