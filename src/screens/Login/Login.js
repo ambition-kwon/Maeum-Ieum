@@ -112,6 +112,7 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingLeft: 10,
     fontSize: 20,
+    color: '#000',
   },
   forgotContainer: {
     flexDirection: 'row',

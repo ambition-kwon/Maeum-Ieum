@@ -97,6 +97,7 @@ const styles = StyleSheet.create({
   input: {
     flex: 1,
     fontSize: 24,
+    color: '#000',
   },
   continueButton: {
     backgroundColor: '#FCCB02',
