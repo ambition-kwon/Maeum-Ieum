@@ -97,6 +97,7 @@ const styles = StyleSheet.create({
   input: {
     flex: 1,
     fontSize: 24,
+    color: '#000',
   },
   continueButton: {
     backgroundColor: '#FCCB02',
@@ -113,5 +114,6 @@ const styles = StyleSheet.create({
   changeText: {
     textAlign: 'center',
     fontSize: 16,
+    color: '#B4B4B4',
   },
 });

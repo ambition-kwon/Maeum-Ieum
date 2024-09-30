@@ -146,6 +146,7 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingLeft: 10,
     fontSize: 18,
+    color: '#000',
   },
   nextIconContainer: {
     position: 'absolute',

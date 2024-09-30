@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useState, useRef} from 'react';
 import {
   View,
   Text,
@@ -10,45 +10,13 @@ import {
 import {useNavigation, useRoute} from '@react-navigation/native';
 import {elderly} from '../../services/controller';
 
-const messages = [
-  {id: 1, text: '오늘 할 일을 알려줄래?', time: '08.18 / 17:00', isSent: true},
-  {
-    id: 2,
-    text: '오늘은 담당 요양사가 방문하는 날입니다!',
-    time: '08.18 / 17:01',
-    isSent: false,
-  },
-  {id: 3, text: '오늘 할 일을 알려줄래?', time: '08.18 / 17:00', isSent: true},
-  {
-    id: 4,
-    text: '오늘은 담당 요양사가 방문하는 날입니다!',
-    time: '08.18 / 17:01',
-    isSent: false,
-  },
-  {id: 5, text: '오늘 할 일을 알려줄래?', time: '08.18 / 17:00', isSent: true},
-  {
-    id: 6,
-    text: '오늘은 담당 요양사가 방문하는 날입니다!',
-    time: '08.18 / 17:01',
-    isSent: false,
-  },
-  {id: 7, text: '오늘 할 일을 알려줄래?', time: '08.18 / 17:00', isSent: true},
-  {
-    id: 8,
-    text: '오늘은 담당 요양사가 방문하는 날입니다!',
-    time: '08.18 / 17:01',
-    isSent: false,
-  },
-  {id: 9, text: '오늘 할 일을 알려줄래?', time: '08.18 / 17:00', isSent: true},
-  {
-    id: 10,
-    text: '오늘은 담당 요양사가 방문하는 날입니다!',
-    time: '08.18 / 17:01',
-    isSent: false,
-  },
-];
-
 export default function ChatRecord() {
+  const scrollViewRef = useRef();
+  const navigation = useNavigation();
+  const route = useRoute();
+  const {elderlyId} = route.params;
+  const [chatData, setChatData] = useState([]);
+
   const renderItem = (item, index) => (
     // isSent가 true이면 흰색 말풍선, false이면 노란 말풍선
     <View
@@ -64,10 +32,6 @@ export default function ChatRecord() {
       </Text>
     </View>
   );
-  const navigation = useNavigation();
-  const route = useRoute();
-  const {elderlyId} = route.params;
-  const [chatData, setChatData] = useState([]);
 
   const handleBackPress = () => {
     navigation.goBack();
@@ -79,6 +43,13 @@ export default function ChatRecord() {
         const response = await elderly.getBeforeChat(elderlyId, 0, 999);
         const reversedChatData = response.data.data.chat.reverse();
         setChatData(reversedChatData);
+
+        setTimeout(() => {
+          if (scrollViewRef.current) {
+            scrollViewRef.current.scrollToEnd({animated: true});
+          }
+        }, 100);
+
       } catch (error) {
         Alert.alert(
           '오류',
@@ -93,9 +64,10 @@ export default function ChatRecord() {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>대화 기록</Text>
-
-      <ScrollView showsVerticalScrollIndicator={false}>
         {/* 메시지 배열 렌더링 */}
+      <ScrollView
+        ref={scrollViewRef}
+        showsVerticalScrollIndicator={false}>
         {chatData.map(item => renderItem(item))}
       </ScrollView>
 

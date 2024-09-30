@@ -140,6 +140,7 @@ const styles = StyleSheet.create({
     paddingLeft: 10,
     fontSize: 24,
     textAlign: 'center',
+    color: '#000',
   },
   nextIconContainer: {
     position: 'absolute',

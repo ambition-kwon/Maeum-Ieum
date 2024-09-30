@@ -175,6 +175,7 @@ const styles = StyleSheet.create({
     paddingLeft: 10,
     fontSize: 20,
     textAlign: 'center',
+    color: '#000',
   },
   searchButton: {
     position: 'absolute',

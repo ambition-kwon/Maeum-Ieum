@@ -541,7 +541,7 @@ const SeniorDetail = () => {
                   elderlyId: elderlyId,
                 });
               }}>
-              <Text>{`주간 보고서(${report.startDate})`}</Text>
+              <Text style={styles.modalItem}>{`주간 보고서(${report.startDate})`}</Text>
             </TouchableOpacity>
           ))}
           <TouchableOpacity
@@ -567,7 +567,7 @@ const SeniorDetail = () => {
                   elderlyId: elderlyId,
                 });
               }}>
-              <Text>{`월간 보고서(${report.startDate})`}</Text>
+              <Text style={styles.modalItem}>{`월간 보고서(${report.startDate})`}</Text>
             </TouchableOpacity>
           ))}
           <TouchableOpacity
@@ -720,6 +720,11 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginBottom: 20,
     color: '#fff',
+  },
+  modalItem: {
+    fontWeight: 'bold',
+    fontSize: 18,
+    color: '#000',
   },
   reportButton: {
     backgroundColor: '#fff',
