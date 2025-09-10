@@ -73,12 +73,10 @@ Maeum-Ieum/
 
 #### 해결 접근
 
-1. **4개월간의 Spring Boot 백엔드 경험을 활용한 서비스 레이어 설계**
-  - **백엔드 관점의 프론트엔드 개발**: 퍼블리싱 없이 순수 서버 연동 로직만 담당
-  - 도메인 별 API 모듈 분리 (caregiver, elderly) - **DDD(Domain Driven Design)** 적용
-  - **Singleton 패턴**으로 axios 인스턴스 전역 관리
+1. **백엔드 경험을 활용한 서비스 레이어 설계**
+  - 도메인 별 API 모듈 분리 (caregiver, elderly) - **DDD(Domain Driven Design)**, **단일 책임 원칙** 적용
+  - **Singleton 패턴**에서 착안한 axios 인스턴스 전역 관리
   - **의존성 주입(DI)** 개념을 활용한 모듈 간 느슨한 결합
-  - **단일 책임 원칙**에 따른 기능별 서비스 분리
    
 2. **Axios 인터셉터 패턴 구현**
    ```javascript
