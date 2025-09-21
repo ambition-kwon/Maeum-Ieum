@@ -130,9 +130,9 @@ export default elderly;
 
 
 #### 2. 중앙화된 HTTP 클라이언트 관리
-Spring boot에서 경험한 Singletone 패턴에서 착안하여 **하나의 axios 인스턴스**로 모든 HTTP 통신을 통합 관리했습니다.
+Spring boot에서 경험한 Singleton 패턴에서 착안하여 **하나의 axios 인스턴스**로 모든 HTTP 통신을 통합 관리했습니다.
 
-##### `src/services/axiosInstance.js` - Singletone Pattern
+##### `src/services/axiosInstance.js` - Singleton Pattern
 ```javascript
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
